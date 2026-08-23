@@ -9,33 +9,21 @@ export const pickRandom = <T>(items: T[], rng: Rng): T | null => {
     return items[Math.min(Math.max(index, 0), items.length - 1)] ?? null;
 };
 
-const neighborBoxes = (
-    state: GameState,
-    edgeId: EdgeId,
-): Array<{ row: number; col: number }> => {
-    const edge = state.edges[edgeId];
-    if (!edge) return [];
-    return edge.orientation === "horizontal"
-        ? [
-              { row: edge.row - 1, col: edge.col },
-              { row: edge.row, col: edge.col },
-          ]
-        : [
-              { row: edge.row, col: edge.col - 1 },
-              { row: edge.row, col: edge.col },
-          ];
-};
-
-/** True when claiming `edgeId` would hand some adjacent box its third side. */
-export const givesAwayBox = (state: GameState, edgeId: EdgeId): boolean =>
-    neighborBoxes(state, edgeId).some((box) => {
-        const known = state.boxes[`${box.row}-${box.col}`];
-        if (!known) return false;
-        const claimedSides = boxEdges(known).filter(
+/** True when claiming `edgeId` would hand some adjacent box its penultimate side (leaving 1 side remaining). */
+export const givesAwayBox = (state: GameState, edgeId: EdgeId): boolean => {
+    for (const box of Object.values(state.boxes)) {
+        if (box.owner !== null) continue;
+        const sides = boxEdges(box);
+        if (!sides.includes(edgeId)) continue;
+        const claimedSides = sides.filter(
             (id) => id !== edgeId && state.edges[id]?.owner !== null,
         ).length;
-        return claimedSides === 2;
-    });
+        if (claimedSides === sides.length - 2) {
+            return true;
+        }
+    }
+    return false;
+};
 
 /** Boxes the opponent could greedily take after this move is played. */
 export const boxesGivenAwayAfter = (
@@ -59,7 +47,7 @@ export const boxesGivenAwayAfter = (
                 takenKeys.add(key);
                 changed = true;
             } else if (
-                sides.filter((id) => edges[id]?.owner !== null).length === 3
+                sides.filter((id) => edges[id]?.owner !== null).length === sides.length - 1
             ) {
                 const missing = sides.find((id) => edges[id]?.owner === null);
                 if (missing !== undefined) {

@@ -17,6 +17,8 @@ const emptyTallies = (): Record<Difficulty, DifficultyTally> => ({
     easy: { ...emptyDifficultyTally },
     medium: { ...emptyDifficultyTally },
     hard: { ...emptyDifficultyTally },
+    insane: { ...emptyDifficultyTally },
+    adaptive: { ...emptyDifficultyTally },
 });
 
 export const initialStatisticsState: StatisticsState = {
@@ -66,12 +68,15 @@ const statisticsSlice = createSlice({
                 },
             };
         },
+        setStatisticsState(_state, action: PayloadAction<StatisticsState>): StatisticsState {
+            return action.payload;
+        },
         resetStatistics(): StatisticsState {
             return initialStatisticsState;
         },
     },
 });
 
-export const { recordGameResult, resetStatistics } = statisticsSlice.actions;
+export const { recordGameResult, setStatisticsState, resetStatistics } = statisticsSlice.actions;
 
 export default statisticsSlice.reducer;

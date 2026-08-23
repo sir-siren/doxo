@@ -4,7 +4,7 @@
     --font-sans:
         ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
-    /* Neo-brutalist pastel design tokens */
+    /* Neo-brutalist pastel design tokens (Default) */
     --color-background: #fdfcf7;
     --color-surface: #ffffff;
     --color-surface-elevated: #fffdf5;
@@ -28,13 +28,204 @@
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+:root, [data-theme="default"] {
+    --color-background: #fdfcf7;
+    --color-surface: #ffffff;
+    --color-surface-elevated: #fffdf5;
+    --color-foreground: #1f2933;
+    --color-muted-foreground: #5f6b76;
+    --color-border: #1f2933;
+    --color-shadow: #1f2933;
+
+    --color-player-one: #7fd8de;
+    --color-player-one-soft: #d3f2f4;
+    --color-player-two: #f9b8c6;
+    --color-player-two-soft: #fce4ea;
+
+    --color-success: #9fdfbf;
+    --color-warning: #f9e0a2;
+    --color-danger: #f5a3a3;
+
+    --shadow-brutal: 4px 4px 0 0 #1f2933;
+    --shadow-brutal-sm: 2px 2px 0 0 #1f2933;
+}
+
+[data-theme="minimal"] {
+    --color-background: #f8fafc;
+    --color-surface: #ffffff;
+    --color-surface-elevated: #f1f5f9;
+    --color-foreground: #0f172a;
+    --color-muted-foreground: #64748b;
+    --color-border: #94a3b8;
+    --color-shadow: rgba(0, 0, 0, 0.1);
+
+    --color-player-one: #38bdf8;
+    --color-player-one-soft: #e0f2fe;
+    --color-player-two: #fb7185;
+    --color-player-two-soft: #ffe4e6;
+
+    --color-success: #86efac;
+    --color-warning: #fde047;
+    --color-danger: #fca5a5;
+
+    --shadow-brutal: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --shadow-brutal-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+    --color-background: #0f172a;
+    --color-surface: #1e293b;
+    --color-surface-elevated: #334155;
+    --color-foreground: #f8fafc;
+    --color-muted-foreground: #94a3b8;
+    --color-border: #475569;
+    --color-shadow: #020617;
+
+    --color-player-one: #2dd4bf;
+    --color-player-one-soft: #134e4a;
+    --color-player-two: #f472b6;
+    --color-player-two-soft: #831843;
+
+    --color-success: #34d399;
+    --color-warning: #fbbf24;
+    --color-danger: #f87171;
+
+    --shadow-brutal: 4px 4px 0 0 #020617;
+    --shadow-brutal-sm: 2px 2px 0 0 #020617;
+}
+
+[data-theme="colorblind"] {
+    --color-background: #fdfbf7;
+    --color-surface: #ffffff;
+    --color-surface-elevated: #f4efe6;
+    --color-foreground: #1c1917;
+    --color-muted-foreground: #57534e;
+    --color-border: #1c1917;
+    --color-shadow: #1c1917;
+
+    --color-player-one: #1d4ed8;
+    --color-player-one-soft: #bfdbfe;
+    --color-player-two: #d97706;
+    --color-player-two-soft: #fde68a;
+
+    --color-success: #059669;
+    --color-warning: #d97706;
+    --color-danger: #dc2626;
+
+    --shadow-brutal: 4px 4px 0 0 #1c1917;
+    --shadow-brutal-sm: 2px 2px 0 0 #1c1917;
+}
+
+/* Physics Spring Keyframes */
+@keyframes page-spring-in {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+    65% {
+        opacity: 1;
+        transform: translateY(-3px) scale(1.004);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes card-spring-in {
+    0% {
+        opacity: 0;
+        transform: translateY(16px) scale(0.96);
+    }
+    70% {
+        opacity: 1;
+        transform: translateY(-2px) scale(1.008);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes badge-pop-spring {
+    0% {
+        opacity: 0;
+        transform: scale(0.6) rotate(-4deg);
+    }
+    70% {
+        opacity: 1;
+        transform: scale(1.12) rotate(2deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+@keyframes modal-spring-pop {
+    0% {
+        opacity: 0;
+        transform: scale(0.85) translateY(24px);
+    }
+    65% {
+        opacity: 1;
+        transform: scale(1.03) translateY(-4px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes score-bounce-spring {
+    0% {
+        transform: scale(1);
+    }
+    35% {
+        transform: scale(1.4) translateY(-4px);
+    }
+    70% {
+        transform: scale(0.95) translateY(1px);
+    }
+    100% {
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes box-activate-spring {
+    0% {
+        opacity: 0;
+        transform: scale(0.35);
+    }
+    60% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    85% {
+        transform: scale(0.96);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes float-physics {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-8px) rotate(1.5deg);
+    }
+}
+
 @keyframes edge-activate-spring {
     0% {
         transform: scale(0.6);
         opacity: 0.6;
     }
     65% {
-        transform: scale(1.1);
+        transform: scale(1.15);
         opacity: 1;
     }
     100% {
@@ -43,8 +234,58 @@
     }
 }
 
+/* Physics Animation Classes */
+.animate-page-spring {
+    animation: page-spring-in 450ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-card-spring {
+    animation: card-spring-in 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-badge-pop {
+    animation: badge-pop-spring 380ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-modal-pop {
+    animation: modal-spring-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-score-bump {
+    animation: score-bounce-spring 450ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-box-spring {
+    animation: box-activate-spring 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-float-slow {
+    animation: float-physics 4s ease-in-out infinite;
+}
+
 .animate-edge-spring {
     animation: edge-activate-spring 350ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Stagger Utility Delays */
+.stagger-1 { animation-delay: 40ms; }
+.stagger-2 { animation-delay: 80ms; }
+.stagger-3 { animation-delay: 120ms; }
+.stagger-4 { animation-delay: 160ms; }
+.stagger-5 { animation-delay: 200ms; }
+.stagger-6 { animation-delay: 240ms; }
+.stagger-7 { animation-delay: 280ms; }
+.stagger-8 { animation-delay: 320ms; }
+
+/* Interactive Tactile Press Physics */
+.spring-touch {
+    transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+                background-color 180ms ease;
+}
+
+.spring-touch:active {
+    transform: translate(2px, 2px) scale(0.98);
 }
 
 @layer base {
@@ -67,11 +308,19 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    :root:not([data-reduced-motion="off"]) *,
+    :root:not([data-reduced-motion="off"]) *::before,
+    :root:not([data-reduced-motion="off"]) *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
+}
+
+[data-reduced-motion="on"] *,
+[data-reduced-motion="on"] *::before,
+[data-reduced-motion="on"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
 }

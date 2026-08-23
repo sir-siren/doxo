@@ -5,15 +5,22 @@ import { HowToPlayScreen } from "@/pages/how-to-play-screen";
 import { StatisticsScreen, type StatisticsData } from "@/pages/statistics-screen";
 import { SettingsScreen } from "@/pages/settings-screen";
 import { GameScreen } from "@/pages/game-screen/GameScreen";
-import type { Difficulty, PlayerId } from "@/features/game/types/game.types";
+import type { BoardShape, Difficulty, PlayerId } from "@/features/game/types/game.types";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import { recordGameResult, resetStatistics } from "@/features/statistics/state/statistics.slice";
+import {
+    recordGameResult,
+    resetStatistics,
+    setStatisticsState,
+} from "@/features/statistics/state/statistics.slice";
 import {
     setSoundEnabled,
     setHapticsEnabled,
     setReducedMotionOverride,
+    setTheme,
+    setSettingsState,
     resetSettings,
 } from "@/features/settings/state/settings.slice";
+import { savePersistedState, type PersistedState } from "@/shared/lib/persistence/storage";
 
 export type ScreenName =
     "welcome" | "setup" | "game" | "how-to-play" | "settings" | "statistics";
@@ -21,6 +28,7 @@ export type ScreenName =
 interface SetupConfig {
     mode: GameMode;
     boardSize: number;
+    shape: BoardShape;
     difficulty: Difficulty;
     playerOneName: string;
     playerTwoName: string;
@@ -29,6 +37,7 @@ interface SetupConfig {
 const DEFAULT_SETUP: SetupConfig = {
     mode: "local",
     boardSize: 6,
+    shape: "rectangle",
     difficulty: "medium",
     playerOneName: "Player 1",
     playerTwoName: "Player 2",
@@ -65,6 +74,15 @@ export function AppRouter() {
         [dispatch, setup.difficulty],
     );
 
+    const handleImportData = useCallback(
+        (data: PersistedState) => {
+            dispatch(setSettingsState(data.settings));
+            dispatch(setStatisticsState(data.statistics));
+            savePersistedState(data);
+        },
+        [dispatch],
+    );
+
     if (screen === "welcome") {
         return (
             <WelcomeScreen
@@ -81,6 +99,7 @@ export function AppRouter() {
             <SetupScreen
                 mode={setup.mode}
                 boardSize={setup.boardSize}
+                shape={setup.shape}
                 difficulty={setup.difficulty}
                 playerOneName={setup.playerOneName}
                 playerTwoName={setup.playerTwoName}
@@ -94,6 +113,9 @@ export function AppRouter() {
                 }}
                 onBoardSizeChange={(boardSize) =>
                     setSetup((prev) => ({ ...prev, boardSize }))
+                }
+                onShapeChange={(shape) =>
+                    setSetup((prev) => ({ ...prev, shape }))
                 }
                 onDifficultyChange={(difficulty) =>
                     setSetup((prev) => ({ ...prev, difficulty }))
@@ -117,6 +139,7 @@ export function AppRouter() {
                 config={{
                     rows: setup.boardSize,
                     cols: setup.boardSize,
+                    shape: setup.shape,
                     mode: setup.mode,
                     difficulty: setup.difficulty,
                     playerOne: {
@@ -142,6 +165,7 @@ export function AppRouter() {
                 hapticsEnabled={settingsState.hapticsEnabled}
                 motion={settingsState.reducedMotionOverride}
                 onHome={goHome}
+                onBack={() => setScreen("setup")}
                 onNewGame={() => setScreen("setup")}
                 onReplay={startGame}
                 onGameOver={handleGameOver}
@@ -156,14 +180,17 @@ export function AppRouter() {
     if (screen === "settings") {
         return (
             <SettingsScreen
+                theme={settingsState.theme}
                 soundEnabled={settingsState.soundEnabled}
                 hapticsEnabled={settingsState.hapticsEnabled}
                 motion={settingsState.reducedMotionOverride}
+                onThemeChange={(theme) => dispatch(setTheme(theme))}
                 onSoundChange={(enabled) => dispatch(setSoundEnabled(enabled))}
                 onHapticsChange={(enabled) => dispatch(setHapticsEnabled(enabled))}
                 onMotionChange={(motion) => dispatch(setReducedMotionOverride(motion))}
                 onResetStatistics={() => dispatch(resetStatistics())}
                 onResetSettings={() => dispatch(resetSettings())}
+                onImportData={handleImportData}
                 onBack={goHome}
             />
         );

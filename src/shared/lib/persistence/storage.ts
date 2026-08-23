@@ -1,4 +1,4 @@
-import type { SettingsState } from "@/features/settings/state/settings.types";
+import type { SettingsState, ThemeName } from "@/features/settings/state/settings.types";
 import { initialSettingsState } from "@/features/settings/state/settings.slice";
 import type { StatisticsState } from "@/features/statistics/state/statistics.types";
 import { initialStatisticsState } from "@/features/statistics/state/statistics.slice";
@@ -13,9 +13,11 @@ export interface PersistedState {
     schemaVersion: number;
     settings: SettingsState;
     statistics: StatisticsState;
+    exportedAt?: string;
 }
 
-const DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard"];
+const DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard", "insane", "adaptive"];
+const THEMES: ThemeName[] = ["default", "minimal", "dark", "colorblind"];
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null && !Array.isArray(value);
@@ -28,6 +30,9 @@ const isFiniteNumber = (value: unknown): value is number =>
 
 const isDifficulty = (value: unknown): value is Difficulty =>
     DIFFICULTIES.includes(value as Difficulty);
+
+const isTheme = (value: unknown): value is ThemeName =>
+    THEMES.includes(value as ThemeName);
 
 const pickBoolean = (
     source: Record<string, unknown>,
@@ -48,6 +53,7 @@ const parseSettings = (raw: unknown): SettingsState => {
     const boardSize = raw["boardSize"];
     const mode = raw["mode"];
     const override = raw["reducedMotionOverride"];
+    const theme = raw["theme"];
     return {
         boardSize:
             isFiniteNumber(boardSize) && boardSize >= 3 && boardSize <= 8
@@ -57,6 +63,7 @@ const parseSettings = (raw: unknown): SettingsState => {
         difficulty: isDifficulty(raw["difficulty"])
             ? raw["difficulty"]
             : initialSettingsState.difficulty,
+        theme: isTheme(theme) ? theme : initialSettingsState.theme,
         playerNames: {
             p1: typeof names["p1"] === "string" ? names["p1"] : "Player 1",
             p2: typeof names["p2"] === "string" ? names["p2"] : "Player 2",
@@ -97,6 +104,8 @@ const parseStatistics = (raw: unknown): StatisticsState => {
             easy: tallyFor("easy"),
             medium: tallyFor("medium"),
             hard: tallyFor("hard"),
+            insane: tallyFor("insane"),
+            adaptive: tallyFor("adaptive"),
         },
     };
 };
@@ -105,7 +114,7 @@ const parseStatistics = (raw: unknown): StatisticsState => {
  * Migration hook: bump SCHEMA_VERSION and add a case per legacy version.
  * Unknown/future versions reset to defaults rather than crashing.
  */
-const migrate = (raw: Record<string, unknown>): PersistedState => {
+export const migrate = (raw: Record<string, unknown>): PersistedState => {
     const version = isFiniteNumber(raw["schemaVersion"])
         ? Math.trunc(raw["schemaVersion"])
         : -1;
@@ -116,6 +125,7 @@ const migrate = (raw: Record<string, unknown>): PersistedState => {
                 schemaVersion: SCHEMA_VERSION,
                 settings: parseSettings(raw["settings"]),
                 statistics: parseStatistics(raw["statistics"]),
+                exportedAt: typeof raw["exportedAt"] === "string" ? raw["exportedAt"] : undefined,
             };
         default:
             // Unknown or missing version, reset to defaults
@@ -154,3 +164,53 @@ export const clearPersistedState = (): void => {
         // Ignore if storage is unavailable
     }
 };
+
+/** Export save data as formatted JSON string. */
+export const exportSaveData = (state: PersistedState): string => {
+    const exportPayload: PersistedState = {
+        ...state,
+        schemaVersion: SCHEMA_VERSION,
+        exportedAt: new Date().toISOString(),
+    };
+    return JSON.stringify(exportPayload, null, 2);
+};
+
+/** Validates and parses JSON save data before applying. */
+export const validateAndParseSaveData = (
+    rawJson: string,
+): { valid: true; data: PersistedState } | { valid: false; error: string } => {
+    try {
+        const parsed: unknown = JSON.parse(rawJson);
+        if (!isRecord(parsed)) {
+            return { valid: false, error: "Invalid file format: root object is missing." };
+        }
+        if (!("schemaVersion" in parsed) || !isFiniteNumber(parsed["schemaVersion"])) {
+            return { valid: false, error: "Invalid backup file: schemaVersion is missing or invalid." };
+        }
+        if (!("settings" in parsed) || !isRecord(parsed["settings"])) {
+            return { valid: false, error: "Invalid backup file: settings payload is missing." };
+        }
+        if (!("statistics" in parsed) || !isRecord(parsed["statistics"])) {
+            return { valid: false, error: "Invalid backup file: statistics payload is missing." };
+        }
+
+        const data = migrate(parsed);
+        return { valid: true, data };
+    } catch {
+        return { valid: false, error: "Malformed JSON file. Please select a valid Doxo backup file." };
+    }
+};
+
+/** Triggers a browser file download for a JSON string. */
+export const triggerJsonDownload = (filename: string, jsonContent: string): void => {
+    const blob = new Blob([jsonContent], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+};
+

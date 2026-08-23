@@ -2,11 +2,13 @@ export type PlayerId = "p1" | "p2";
 
 export type PlayerKind = "human" | "ai";
 
-export type Difficulty = "easy" | "medium" | "hard";
+export type Difficulty = "easy" | "medium" | "hard" | "insane" | "adaptive";
 
 export type GameStatus = "idle" | "playing" | "finished";
 
-export type Orientation = "horizontal" | "vertical";
+export type BoardShape = "rectangle" | "triangle" | "l-shape" | "hex";
+
+export type Orientation = "horizontal" | "vertical" | "hex-0" | "hex-1" | "hex-2";
 
 export type EdgeId = string;
 
@@ -16,12 +18,17 @@ export interface Edge {
     row: number;
     col: number;
     owner: PlayerId | null;
+    x1?: number;
+    y1?: number;
+    x2?: number;
+    y2?: number;
 }
 
 export interface Box {
     row: number;
     col: number;
     owner: PlayerId | null;
+    edgeIds?: EdgeId[];
 }
 
 export interface Player {
@@ -34,6 +41,7 @@ export interface Player {
 export interface BoardDimensions {
     rows: number;
     cols: number;
+    shape?: BoardShape;
 }
 
 export interface Move {

@@ -71,7 +71,7 @@ export function Modal({
 
     return (
         <div
-            className="fixed inset-0 z-50 overflow-y-auto bg-foreground/40 p-4 sm:p-6"
+            className="fixed inset-0 z-50 overflow-y-auto bg-foreground/40 backdrop-blur-[2px] p-4 sm:p-6 transition-opacity duration-200"
             onClick={() => onCloseRef.current()}
             role="presentation"
         >
@@ -82,7 +82,7 @@ export function Modal({
                     aria-modal="true"
                     aria-label={title}
                     tabIndex={-1}
-                    className="my-auto w-full max-w-sm rounded-2xl border-2 border-border bg-surface p-6 pb-7 shadow-brutal focus:outline-none sm:p-7 sm:pb-8"
+                    className="animate-modal-pop my-auto w-full max-w-sm rounded-2xl border-2 border-border bg-surface p-6 pb-7 shadow-brutal focus:outline-none sm:p-7 sm:pb-8"
                     onClick={(event) => event.stopPropagation()}
                 >
                     <h2 className="mb-4 text-xl font-black uppercase tracking-wide text-foreground">

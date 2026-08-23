@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { startGame, makeMove, undo } from "@/features/game/state/game.slice";
 import { getValidMoves } from "@/features/game/engine/move-validator";
@@ -6,13 +6,15 @@ import { detectCompletedBoxes } from "@/features/game/engine/box-detector";
 import type {
     Difficulty,
     Player,
+    BoardShape,
 } from "@/features/game/types/game.types";
-import { createAiStrategy, type AiStrategy } from "@/features/ai";
+import { createAiStrategy, resolveAdaptiveDifficulty, type AiStrategy } from "@/features/ai";
 import { GameBoard } from "@/features/game/components/GameBoard";
 import { Scoreboard } from "@/features/game/components/Scoreboard";
 import { TurnIndicator } from "@/features/game/components/TurnIndicator";
 import { Button } from "@/shared/ui/Button";
 import { Modal } from "@/shared/ui/Modal";
+import { Logo } from "@/shared/ui/Logo";
 import { PageContainer } from "@/shared/layout";
 import {
     playMoveSound,
@@ -24,6 +26,7 @@ import {
 export interface GameConfig {
     rows: number;
     cols: number;
+    shape?: BoardShape;
     mode: "local" | "ai";
     difficulty: Difficulty;
     playerOne: Player;
@@ -35,7 +38,8 @@ interface GameScreenProps {
     soundEnabled?: boolean;
     hapticsEnabled: boolean;
     motion: "system" | "on" | "off";
-    onHome: () => void;
+    onHome?: () => void;
+    onBack?: () => void;
     onNewGame: () => void;
     onReplay: () => void;
     onGameOver?: (winner: "p1" | "p2" | "draw", p1Score: number, p2Score: number) => void;
@@ -62,12 +66,14 @@ export function GameScreen({
     soundEnabled = true,
     hapticsEnabled,
     onHome,
+    onBack,
     onNewGame,
     onReplay,
     onGameOver,
 }: GameScreenProps) {
     const dispatch = useAppDispatch();
     const gameSlice = useAppSelector((store) => store.game);
+    const statsState = useAppSelector((store) => store.statistics);
     const state = gameSlice.current;
 
     const strategyRef = useRef<AiStrategy | null>(null);
@@ -77,14 +83,25 @@ export function GameScreen({
     const toastTimerRef = useRef<number | null>(null);
     const reportedGameOverRef = useRef(false);
 
+    const effectiveDifficulty = useMemo<Difficulty>(() => {
+        if (config.difficulty === "adaptive") {
+            return resolveAdaptiveDifficulty(statsState, { boardSize: config.rows });
+        }
+        return config.difficulty;
+    }, [config.difficulty, config.rows, statsState]);
+
     useEffect(() => {
         dispatch(
             startGame({
-                dimensions: { rows: config.rows, cols: config.cols },
+                dimensions: {
+                    rows: config.rows,
+                    cols: config.cols,
+                    shape: config.shape ?? "rectangle",
+                },
                 players: [config.playerOne, config.playerTwo],
             }),
         );
-    }, [dispatch, config.rows, config.cols, config.playerOne, config.playerTwo]);
+    }, [dispatch, config.rows, config.cols, config.shape, config.playerOne, config.playerTwo]);
 
     useEffect(() => {
         return () => {
@@ -118,7 +135,7 @@ export function GameScreen({
     useEffect(() => {
         strategyRef.current =
             config.playerTwo.kind === "ai"
-                ? createAiStrategy(config.difficulty)
+                ? createAiStrategy(effectiveDifficulty)
                 : null;
         return () => {
             if (timerRef.current !== null)
@@ -126,7 +143,7 @@ export function GameScreen({
             timerRef.current = null;
             strategyRef.current = null;
         };
-    }, [config.playerTwo.kind, config.difficulty]);
+    }, [config.playerTwo.kind, effectiveDifficulty]);
 
     const isAiTurn =
         state !== null &&
@@ -220,72 +237,91 @@ export function GameScreen({
         state.status === "playing" &&
         !(config.mode === "ai" && state.currentPlayer === "p2");
 
-    return (
-        <PageContainer className="min-h-dvh max-w-7xl px-4 sm:px-8 py-4 sm:py-6">
-            <header className="flex items-center justify-between w-full max-w-6xl mx-auto">
-                <Button
-                    variant="ghost"
-                    onClick={onHome}
-                    aria-label="Back to home"
-                    className="flex items-center gap-1.5"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="size-5 shrink-0"
-                        aria-hidden="true"
-                    >
-                        <path d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42-.39-.39-1.02-.39-1.41 0l-6.59 6.59c-.39.39-.39 1.02 0 1.41l6.59 6.59c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1z" />
-                    </svg>
-                    <span>Home</span>
-                </Button>
-                <h1 className="text-xl font-black uppercase tracking-widest sm:text-2xl">
-                    Doxo
-                </h1>
-                <span className="w-16 text-right text-sm font-bold uppercase text-muted-foreground">
-                    {aiThinking ? "AI…" : ""}
-                </span>
-            </header>
+    const handleBackClick = onBack ?? onHome;
 
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-center lg:gap-10 xl:gap-14 w-full my-auto">
-                <div className="flex flex-col gap-4 w-full lg:w-72 xl:w-80 lg:shrink-0">
-                    <Scoreboard
-                        players={state.players}
-                        scores={state.scores}
-                        currentPlayer={state.currentPlayer}
-                    />
+    return (
+        <PageContainer className="min-h-dvh max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col justify-center">
+            <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 xl:gap-16 w-full my-auto">
+                {/* Left Panel (Scoreboard & Controls) - 40% Width with Strict Left-Edge Alignment */}
+                <div className="animate-card-spring stagger-1 w-full lg:w-[40%] lg:flex-[0_0_40%] max-w-md flex flex-col items-start gap-4">
+                    {/* Top-Left Back Button */}
+                    <Button
+                        variant="secondary"
+                        onClick={handleBackClick}
+                        aria-label="Back"
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-black uppercase tracking-wider shadow-brutal-sm rounded-xl border-2 border-border bg-surface"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            className="size-4 shrink-0"
+                            aria-hidden="true"
+                        >
+                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+                        </svg>
+                        <span>Back</span>
+                    </Button>
+
+                    {/* Scoreboard Cards */}
+                    <div className="w-full">
+                        <Scoreboard
+                            players={state.players}
+                            scores={state.scores}
+                            currentPlayer={state.currentPlayer}
+                        />
+                    </div>
+
+                    {/* Turn Indicator */}
                     <TurnIndicator
                         status={state.status}
                         currentPlayer={state.currentPlayer}
                         currentPlayerName={currentPlayerName}
                         winner={state.winner}
                     />
+
+                    {/* Controls (New Game & Undo) */}
+                    <div className="flex gap-3 w-full">
+                        <Button variant="primary" fullWidth onClick={onReplay}>
+                            New Game
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            fullWidth
+                            onClick={handleUndo}
+                            disabled={!canUndo}
+                        >
+                            Undo
+                        </Button>
+                    </div>
                 </div>
 
-                <div className="flex flex-1 items-center justify-center min-w-0 w-full">
-                    <GameBoard
-                        state={state}
-                        isPlayable={isPlayable}
-                        onSelectEdge={handleSelectEdge}
-                        onDotClick={handleDotClick}
-                    />
+                {/* Right Panel (Game Title & Game Board) - 60% Width */}
+                <div className="animate-card-spring stagger-2 w-full lg:w-[60%] lg:flex-[0_0_60%] flex flex-col items-center justify-center min-w-0">
+                    {/* Game Title Centered Directly Above Grid */}
+                    <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
+                        <Logo className="size-7 sm:size-8 text-player-one" />
+                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-widest">
+                            Doxo
+                        </h1>
+                        {aiThinking && (
+                            <span className="ml-2 text-xs font-black uppercase tracking-wider text-muted-foreground bg-surface px-2.5 py-1 rounded-lg border-2 border-border shadow-brutal-sm animate-pulse">
+                                AI Thinking…
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Centered Board Grid */}
+                    <div className="flex w-full items-center justify-center min-w-0">
+                        <GameBoard
+                            state={state}
+                            isPlayable={isPlayable}
+                            onSelectEdge={handleSelectEdge}
+                            onDotClick={handleDotClick}
+                        />
+                    </div>
                 </div>
             </div>
-
-            <footer className="flex gap-3 max-w-md mx-auto w-full mt-2">
-                <Button variant="secondary" fullWidth onClick={onReplay}>
-                    New Game
-                </Button>
-                <Button
-                    variant="ghost"
-                    fullWidth
-                    onClick={handleUndo}
-                    disabled={!canUndo}
-                >
-                    Undo
-                </Button>
-            </footer>
 
             <Modal
                 open={state.status === "finished"}
@@ -303,6 +339,12 @@ export function GameScreen({
                         {state.players[0]?.name}: {state.scores.p1} ·{" "}
                         {state.players[1]?.name}: {state.scores.p2}
                     </p>
+                    {config.mode === "ai" && (
+                        <p className="mt-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                            AI Level: {effectiveDifficulty}
+                            {config.difficulty === "adaptive" ? " (Adaptive)" : ""}
+                        </p>
+                    )}
                 </div>
                 <div className="flex flex-col gap-3">
                     <Button fullWidth onClick={onReplay}>

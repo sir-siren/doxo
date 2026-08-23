@@ -39,20 +39,20 @@ export function StatisticsScreen({
     onBack,
 }: StatisticsScreenProps) {
     return (
-        <PageContainer className="min-h-dvh">
-            <h1 className="text-center text-3xl font-black uppercase tracking-widest">
+        <PageContainer className="min-h-dvh py-6">
+            <h1 className="animate-card-spring stagger-1 text-center text-3xl font-black uppercase tracking-widest">
                 Statistics
             </h1>
             {statistics === null || statistics.gamesPlayed === 0 ? (
-                <Card className="p-6 text-center font-semibold text-muted-foreground">
+                <Card className="animate-card-spring stagger-2 p-6 text-center font-semibold text-muted-foreground">
                     No games yet. Play your first game to start tracking stats!
                 </Card>
             ) : (
-                <Card className="divide-y-2 divide-border/10 p-2">
-                    {ROWS.map(({ key, label }) => (
+                <Card className="animate-card-spring stagger-2 divide-y-2 divide-border/10 p-2">
+                    {ROWS.map(({ key, label }, index) => (
                         <div
                             key={key}
-                            className="flex items-center justify-between px-3 py-3"
+                            className={`animate-card-spring stagger-${Math.min(index + 1, 8)} flex items-center justify-between px-3 py-3 transition-colors hover:bg-surface-elevated rounded-lg`}
                         >
                             <span className="font-semibold text-muted-foreground">
                                 {label}
@@ -66,7 +66,7 @@ export function StatisticsScreen({
                     ))}
                 </Card>
             )}
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="animate-card-spring stagger-4 flex flex-col gap-3 sm:flex-row">
                 <Button variant="danger" fullWidth onClick={onReset}>
                     Reset Statistics
                 </Button>

@@ -17,5 +17,6 @@ export type {
     Difficulty,
     EdgeId,
     GameState,
+    PlayerId,
 } from "@/features/game/types/game.types";
 

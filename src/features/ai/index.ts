@@ -2,6 +2,7 @@ import type { AiStrategy, Difficulty, Rng } from "@/features/ai/ai.types";
 import { createRandomStrategy } from "@/features/ai/strategies/random-strategy";
 import { createSafeMoveStrategy } from "@/features/ai/strategies/safe-move-strategy";
 import { createStrategicStrategy } from "@/features/ai/strategies/strategic-strategy";
+import { createMinimaxStrategy } from "@/features/ai/strategies/minimax-strategy";
 
 /** Builds the AI strategy matching a difficulty level. */
 export function createAiStrategy(
@@ -16,6 +17,10 @@ export function createAiStrategy(
             return createSafeMoveStrategy(injectRng);
         case "hard":
             return createStrategicStrategy(injectRng);
+        case "insane":
+            return createMinimaxStrategy(injectRng);
+        case "adaptive":
+            return createStrategicStrategy(injectRng);
         default: {
             const unhandled: never = difficulty;
             throw new Error(`Unhandled difficulty: ${String(unhandled)}`);
@@ -27,3 +32,6 @@ export type { AiStrategy, Difficulty, Rng } from "@/features/ai/ai.types";
 export { createRandomStrategy } from "@/features/ai/strategies/random-strategy";
 export { createSafeMoveStrategy } from "@/features/ai/strategies/safe-move-strategy";
 export { createStrategicStrategy } from "@/features/ai/strategies/strategic-strategy";
+export { createMinimaxStrategy } from "@/features/ai/strategies/minimax-strategy";
+export { resolveAdaptiveDifficulty } from "@/features/ai/adaptive-difficulty";
+

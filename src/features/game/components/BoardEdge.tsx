@@ -22,22 +22,12 @@ function BoardEdgeInner({
     currentPlayer,
     onSelect,
 }: BoardEdgeProps) {
-    const { x1, y1, x2, y2 } = edgeCoordinates(edge.id, geometry);
+    const { x1, y1, x2, y2 } = edgeCoordinates(edge, geometry);
     const claimed = edge.owner !== null;
     const strokeClass = claimed
         ? playerEdgeClass(edge.owner)
         : edgePreviewClass(currentPlayer);
-    const isHorizontal = edge.orientation === "horizontal";
 
-    const hitWidth = isHorizontal
-        ? geometry.cellSize
-        : Math.max(32, geometry.edgeStrokeWidth + 24);
-    const hitHeight = isHorizontal
-        ? Math.max(32, geometry.edgeStrokeWidth + 24)
-        : geometry.cellSize;
-
-    const hitX = isHorizontal ? x1 : x1 - hitWidth / 2;
-    const hitY = isHorizontal ? y1 - hitHeight / 2 : y1;
     const midX = (x1 + x2) / 2;
     const midY = (y1 + y2) / 2;
 
@@ -62,19 +52,27 @@ function BoardEdgeInner({
                 strokeLinecap="round"
             />
             {!claimed && (
-                <rect
-                    x={hitX}
-                    y={hitY}
-                    width={hitWidth}
-                    height={hitHeight}
-                    rx={4}
+                <line
+                    x1={x1}
+                    y1={y1}
+                    x2={x2}
+                    y2={y2}
+                    stroke="transparent"
+                    strokeWidth={Math.max(28, geometry.edgeStrokeWidth + 20)}
+                    strokeLinecap="round"
                     className={
                         isSelectable
-                            ? "fill-transparent cursor-pointer focus:outline-none"
-                            : "fill-transparent pointer-events-none"
+                            ? "cursor-pointer focus:outline-none"
+                            : "pointer-events-none"
                     }
                     role={isSelectable ? "button" : undefined}
-                    aria-label={`Claim ${isHorizontal ? "horizontal" : "vertical"} edge row ${edge.row + 1}, column ${edge.col + 1}`}
+                    aria-label={`Claim ${
+                        edge.orientation === "horizontal"
+                            ? "horizontal"
+                            : edge.orientation === "vertical"
+                              ? "vertical"
+                              : "hex"
+                    } edge row ${edge.row + 1}, column ${edge.col + 1}`}
                     aria-disabled={!isSelectable}
                     tabIndex={isSelectable ? 0 : -1}
                     onClick={() => onSelect(edge.id)}

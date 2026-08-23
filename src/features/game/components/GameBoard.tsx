@@ -81,6 +81,7 @@ export function GameBoard({
                 <BoardDots
                     dimensions={state.dimensions}
                     geometry={geometry}
+                    edges={state.edges}
                     onDotClick={onDotClick}
                 />
             </svg>

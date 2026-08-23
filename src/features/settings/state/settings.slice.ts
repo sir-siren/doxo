@@ -4,6 +4,7 @@ import type {
     GameMode,
     ReducedMotionOverride,
     SettingsState,
+    ThemeName,
 } from "./settings.types";
 
 export const BOARD_SIZE_MIN = 3;
@@ -15,6 +16,7 @@ export const initialSettingsState: SettingsState = {
     boardSize: 6,
     mode: "local",
     difficulty: "medium",
+    theme: "default",
     playerNames: DEFAULT_PLAYER_NAMES,
     playerKinds: ["human", "human"],
     soundEnabled: true,
@@ -51,6 +53,9 @@ const settingsSlice = createSlice({
                     trimmed.length > 0 ? trimmed : "Player",
             };
         },
+        setTheme(state, action: PayloadAction<ThemeName>): void {
+            state.theme = action.payload;
+        },
         setSoundEnabled(state, action: PayloadAction<boolean>): void {
             state.soundEnabled = action.payload;
         },
@@ -63,6 +68,9 @@ const settingsSlice = createSlice({
         ): void {
             state.reducedMotionOverride = action.payload;
         },
+        setSettingsState(_state, action: PayloadAction<SettingsState>): SettingsState {
+            return action.payload;
+        },
         resetSettings(): SettingsState {
             return initialSettingsState;
         },
@@ -73,10 +81,12 @@ export const {
     setBoardSize,
     setMode,
     setDifficulty,
+    setTheme,
     setPlayerName,
     setSoundEnabled,
     setHapticsEnabled,
     setReducedMotionOverride,
+    setSettingsState,
     resetSettings,
 } = settingsSlice.actions;
 
