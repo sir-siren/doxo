@@ -47,7 +47,8 @@ export const boxesGivenAwayAfter = (
                 takenKeys.add(key);
                 changed = true;
             } else if (
-                sides.filter((id) => edges[id]?.owner !== null).length === sides.length - 1
+                sides.filter((id) => edges[id]?.owner !== null).length ===
+                sides.length - 1
             ) {
                 const missing = sides.find((id) => edges[id]?.owner === null);
                 if (missing !== undefined) {

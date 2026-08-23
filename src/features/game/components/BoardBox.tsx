@@ -1,6 +1,10 @@
 import { memo } from "react";
 import type { PlayerId } from "@/features/game/types/game.types";
-import { boxCenter, hexPolygonPoints, type BoardGeometry } from "../hooks/useGameBoard";
+import {
+    boxCenter,
+    hexPolygonPoints,
+    type BoardGeometry,
+} from "../hooks/useGameBoard";
 
 interface BoardBoxProps {
     row: number;

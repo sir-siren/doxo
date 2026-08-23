@@ -10,4 +10,3 @@ export function createRandomStrategy(rng: Rng = Math.random): AiStrategy {
         },
     };
 }
-

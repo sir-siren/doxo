@@ -28,4 +28,3 @@ export const detectCompletedBoxes = (
 
     return completed;
 };
-

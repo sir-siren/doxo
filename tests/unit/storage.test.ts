@@ -53,7 +53,9 @@ describe("save data export and import", () => {
     });
 
     it("gracefully rejects JSON with missing required fields", () => {
-        const result = validateAndParseSaveData(JSON.stringify({ someKey: "value" }));
+        const result = validateAndParseSaveData(
+            JSON.stringify({ someKey: "value" }),
+        );
         expect(result.valid).toBe(false);
         if (!result.valid) {
             expect(result.error).toContain("Invalid backup file");

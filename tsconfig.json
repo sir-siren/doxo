@@ -1,5 +1,10 @@
-// tsconfig.json
 {
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["./src/*"]
+        }
+    },
     "files": [],
     "references": [
         {

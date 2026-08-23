@@ -1,14 +1,26 @@
-import type { AiStrategy, EdgeId, GameState, PlayerId } from "@/features/ai/ai.types";
+import type {
+    AiStrategy,
+    EdgeId,
+    GameState,
+    PlayerId,
+} from "@/features/ai/ai.types";
 import { applyMove, getValidMoves } from "@/features/game/engine/game-engine";
 import { detectCompletedBoxes } from "@/features/game/engine/box-detector";
-import { givesAwayBox, pickRandom, type Rng } from "@/features/ai/strategy-helpers";
+import {
+    givesAwayBox,
+    pickRandom,
+    type Rng,
+} from "@/features/ai/strategy-helpers";
 import { createStrategicStrategy } from "@/features/ai/strategies/strategic-strategy";
 
 const MAX_EXACT_EDGES = 14;
 const MAX_SEARCH_DEPTH_4X4 = 5;
 const MAX_SEARCH_DEPTH_5X5 = 4;
 
-function determineMaxDepth(state: GameState, remainingEdgesCount: number): number {
+function determineMaxDepth(
+    state: GameState,
+    remainingEdgesCount: number,
+): number {
     const maxDimension = Math.max(state.dimensions.rows, state.dimensions.cols);
     if (maxDimension <= 3 || remainingEdgesCount <= MAX_EXACT_EDGES) {
         return Math.min(10, remainingEdgesCount);
@@ -24,8 +36,10 @@ function determineMaxDepth(state: GameState, remainingEdgesCount: number): numbe
 
 function evaluateLeaf(state: GameState, maximizingPlayer: PlayerId): number {
     const minimizingPlayer: PlayerId = maximizingPlayer === "p1" ? "p2" : "p1";
-    const scoreDiff = (state.scores[maximizingPlayer] ?? 0) - (state.scores[minimizingPlayer] ?? 0);
-    
+    const scoreDiff =
+        (state.scores[maximizingPlayer] ?? 0) -
+        (state.scores[minimizingPlayer] ?? 0);
+
     // If game finished, return large definitive score
     if (state.status === "finished") {
         if (state.winner === maximizingPlayer) return 1000 + scoreDiff * 10;
@@ -52,7 +66,12 @@ function orderMoves(state: GameState, validMoves: EdgeId[]): EdgeId[] {
     const risky: EdgeId[] = [];
 
     for (const edgeId of validMoves) {
-        if (detectCompletedBoxes({ edges: state.edges, boxes: state.boxes }, edgeId).length > 0) {
+        if (
+            detectCompletedBoxes(
+                { edges: state.edges, boxes: state.boxes },
+                edgeId,
+            ).length > 0
+        ) {
             scoring.push(edgeId);
         } else if (!givesAwayBox(state, edgeId)) {
             safe.push(edgeId);
@@ -94,10 +113,19 @@ function alphaBeta(
         let currentAlpha = alpha;
 
         for (const edgeId of orderedMoves) {
-            const next = applyMove(state, { edgeId, player: state.currentPlayer });
+            const next = applyMove(state, {
+                edgeId,
+                player: state.currentPlayer,
+            });
             // Extra turn bonus: if scored, same player keeps moving
             const searchDepth = next.scored ? depth : depth - 1;
-            const evalResult = alphaBeta(next.state, searchDepth, currentAlpha, beta, maximizingPlayer);
+            const evalResult = alphaBeta(
+                next.state,
+                searchDepth,
+                currentAlpha,
+                beta,
+                maximizingPlayer,
+            );
 
             if (evalResult.score > maxEval) {
                 maxEval = evalResult.score;
@@ -115,9 +143,18 @@ function alphaBeta(
         let currentBeta = beta;
 
         for (const edgeId of orderedMoves) {
-            const next = applyMove(state, { edgeId, player: state.currentPlayer });
+            const next = applyMove(state, {
+                edgeId,
+                player: state.currentPlayer,
+            });
             const searchDepth = next.scored ? depth : depth - 1;
-            const evalResult = alphaBeta(next.state, searchDepth, alpha, currentBeta, maximizingPlayer);
+            const evalResult = alphaBeta(
+                next.state,
+                searchDepth,
+                alpha,
+                currentBeta,
+                maximizingPlayer,
+            );
 
             if (evalResult.score < minEval) {
                 minEval = evalResult.score;
@@ -143,13 +180,20 @@ export function createMinimaxStrategy(rng: Rng = Math.random): AiStrategy {
 
             // Immediate score: if any move takes a box, immediately take it
             const immediateScoring = validMoves.filter(
-                (id) => detectCompletedBoxes({ edges: state.edges, boxes: state.boxes }, id).length > 0,
+                (id) =>
+                    detectCompletedBoxes(
+                        { edges: state.edges, boxes: state.boxes },
+                        id,
+                    ).length > 0,
             );
             if (immediateScoring.length > 0) {
                 return pickRandom(immediateScoring, rng);
             }
 
-            const maxDimension = Math.max(state.dimensions.rows, state.dimensions.cols);
+            const maxDimension = Math.max(
+                state.dimensions.rows,
+                state.dimensions.cols,
+            );
             if (maxDimension > 5 && validMoves.length > MAX_EXACT_EDGES) {
                 return strategicFallback.selectMove(state, validMoves);
             }
@@ -167,7 +211,10 @@ export function createMinimaxStrategy(rng: Rng = Math.random): AiStrategy {
                 state.currentPlayer,
             );
 
-            return result.bestMove ?? strategicFallback.selectMove(state, validMoves);
+            return (
+                result.bestMove ??
+                strategicFallback.selectMove(state, validMoves)
+            );
         },
     };
 }

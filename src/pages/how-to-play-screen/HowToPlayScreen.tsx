@@ -69,7 +69,10 @@ export function HowToPlayScreen({ onBack }: { onBack: () => void }) {
             {activeTab === "rules" ? (
                 <ol className="flex flex-col gap-3">
                     {STEPS.map((step, index) => (
-                        <li key={step.title} className={`animate-card-spring stagger-${index + 1}`}>
+                        <li
+                            key={step.title}
+                            className={`animate-card-spring stagger-${index + 1}`}
+                        >
                             <Card className="flex items-start gap-4 p-4">
                                 <span
                                     aria-hidden="true"

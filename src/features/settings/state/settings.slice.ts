@@ -68,7 +68,10 @@ const settingsSlice = createSlice({
         ): void {
             state.reducedMotionOverride = action.payload;
         },
-        setSettingsState(_state, action: PayloadAction<SettingsState>): SettingsState {
+        setSettingsState(
+            _state,
+            action: PayloadAction<SettingsState>,
+        ): SettingsState {
             return action.payload;
         },
         resetSettings(): SettingsState {

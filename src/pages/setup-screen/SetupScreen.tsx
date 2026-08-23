@@ -3,7 +3,10 @@ import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { PageContainer } from "@/shared/layout";
 import type { BoardShape, Difficulty } from "@/features/game/types/game.types";
-import { BOARD_PRESETS, findPresetBySize } from "@/features/settings/constants/presets";
+import {
+    BOARD_PRESETS,
+    findPresetBySize,
+} from "@/features/settings/constants/presets";
 import { cn } from "@/shared/lib/cn";
 
 export type GameMode = "local" | "ai";
@@ -32,7 +35,11 @@ const DIFFICULTIES: Array<{ id: Difficulty; label: string; desc: string }> = [
     { id: "medium", label: "Medium", desc: "Avoids handing free boxes" },
     { id: "hard", label: "Hard", desc: "Strategic chain management" },
     { id: "insane", label: "Insane", desc: "Minimax depth search" },
-    { id: "adaptive", label: "Adaptive", desc: "Auto-scales with your win rate" },
+    {
+        id: "adaptive",
+        label: "Adaptive",
+        desc: "Auto-scales with your win rate",
+    },
 ];
 
 const SHAPES: Array<{ id: BoardShape; label: string }> = [
@@ -183,7 +190,9 @@ export function SetupScreen(props: SetupScreenProps) {
 
                     <div className="grid grid-cols-3 gap-2">
                         {BOARD_PRESETS.map((preset) => {
-                            const isSelected = !showCustomSize && props.boardSize === preset.size;
+                            const isSelected =
+                                !showCustomSize &&
+                                props.boardSize === preset.size;
                             return (
                                 <button
                                     key={preset.id}
@@ -199,7 +208,9 @@ export function SetupScreen(props: SetupScreenProps) {
                                             : "bg-surface hover:bg-surface-elevated",
                                     )}
                                 >
-                                    <span className="text-sm font-bold uppercase">{preset.name}</span>
+                                    <span className="text-sm font-bold uppercase">
+                                        {preset.name}
+                                    </span>
                                     <span className="text-[11px] font-semibold text-muted-foreground">
                                         {preset.size}×{preset.size}
                                     </span>
@@ -239,7 +250,9 @@ export function SetupScreen(props: SetupScreenProps) {
                                         type="button"
                                         role="radio"
                                         aria-checked={isSelected}
-                                        onClick={() => props.onDifficultyChange(diff.id)}
+                                        onClick={() =>
+                                            props.onDifficultyChange(diff.id)
+                                        }
                                         className={cn(
                                             "min-h-10 rounded-lg border-2 border-border px-2 text-xs font-bold uppercase shadow-brutal-sm transition-all duration-200 ease-spring active:translate-x-0.5 active:translate-y-0.5 focus:outline-none focus-visible:outline-none",
                                             isSelected
@@ -253,7 +266,11 @@ export function SetupScreen(props: SetupScreenProps) {
                             })}
                         </div>
                         <p className="mt-1.5 text-xs font-semibold text-muted-foreground">
-                            {DIFFICULTIES.find((d) => d.id === props.difficulty)?.desc}
+                            {
+                                DIFFICULTIES.find(
+                                    (d) => d.id === props.difficulty,
+                                )?.desc
+                            }
                         </p>
                     </section>
                 )}
@@ -293,4 +310,3 @@ export function SetupScreen(props: SetupScreenProps) {
         </PageContainer>
     );
 }
-

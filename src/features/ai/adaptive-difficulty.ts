@@ -16,7 +16,10 @@ export interface AdaptiveDifficultyOptions {
  * - Win rate < 30%: "easy"
  */
 export function resolveAdaptiveDifficulty(
-    statistics: Pick<StatisticsState, "gamesPlayed" | "wins" | "losses" | "draws">,
+    statistics: Pick<
+        StatisticsState,
+        "gamesPlayed" | "wins" | "losses" | "draws"
+    >,
     options?: AdaptiveDifficultyOptions,
 ): Difficulty {
     const { gamesPlayed, wins } = statistics;
@@ -39,7 +42,11 @@ export function resolveAdaptiveDifficulty(
     }
 
     // Performance safeguard for large boards on Insane minimax
-    if (targetDifficulty === "insane" && options?.boardSize !== undefined && options.boardSize > 4) {
+    if (
+        targetDifficulty === "insane" &&
+        options?.boardSize !== undefined &&
+        options.boardSize > 4
+    ) {
         return "hard";
     }
 

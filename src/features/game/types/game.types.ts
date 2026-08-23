@@ -8,7 +8,8 @@ export type GameStatus = "idle" | "playing" | "finished";
 
 export type BoardShape = "rectangle" | "triangle" | "l-shape" | "hex";
 
-export type Orientation = "horizontal" | "vertical" | "hex-0" | "hex-1" | "hex-2";
+export type Orientation =
+    "horizontal" | "vertical" | "hex-0" | "hex-1" | "hex-2";
 
 export type EdgeId = string;
 
@@ -66,4 +67,3 @@ export interface ApplyMoveResult {
     completedBoxes: string[];
     scored: boolean;
 }
-

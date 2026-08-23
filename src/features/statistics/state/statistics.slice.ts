@@ -68,7 +68,10 @@ const statisticsSlice = createSlice({
                 },
             };
         },
-        setStatisticsState(_state, action: PayloadAction<StatisticsState>): StatisticsState {
+        setStatisticsState(
+            _state,
+            action: PayloadAction<StatisticsState>,
+        ): StatisticsState {
             return action.payload;
         },
         resetStatistics(): StatisticsState {
@@ -77,6 +80,7 @@ const statisticsSlice = createSlice({
     },
 });
 
-export const { recordGameResult, setStatisticsState, resetStatistics } = statisticsSlice.actions;
+export const { recordGameResult, setStatisticsState, resetStatistics } =
+    statisticsSlice.actions;
 
 export default statisticsSlice.reducer;

@@ -101,7 +101,9 @@ export function SettingsScreen(props: SettingsScreenProps) {
     const [confirmAction, setConfirmAction] = useState<
         "stats" | "settings" | null
     >(null);
-    const [pendingImport, setPendingImport] = useState<PersistedState | null>(null);
+    const [pendingImport, setPendingImport] = useState<PersistedState | null>(
+        null,
+    );
     const [importError, setImportError] = useState<string | null>(null);
     const [statusToast, setStatusToast] = useState<string | null>(null);
 
@@ -112,7 +114,10 @@ export function SettingsScreen(props: SettingsScreenProps) {
             statistics: statsState,
         };
         const json = exportSaveData(payload);
-        triggerJsonDownload(`doxo-backup-${new Date().toISOString().slice(0, 10)}.json`, json);
+        triggerJsonDownload(
+            `doxo-backup-${new Date().toISOString().slice(0, 10)}.json`,
+            json,
+        );
         setStatusToast("Backup downloaded successfully!");
         setTimeout(() => setStatusToast(null), 3000);
     };
@@ -182,11 +187,15 @@ export function SettingsScreen(props: SettingsScreenProps) {
                                 <div className="flex items-center gap-1.5">
                                     <span
                                         className="size-4 rounded-full border border-border shadow-brutal-sm"
-                                        style={{ backgroundColor: themeOpt.p1Color }}
+                                        style={{
+                                            backgroundColor: themeOpt.p1Color,
+                                        }}
                                     />
                                     <span
                                         className="size-4 rounded-full border border-border shadow-brutal-sm"
-                                        style={{ backgroundColor: themeOpt.p2Color }}
+                                        style={{
+                                            backgroundColor: themeOpt.p2Color,
+                                        }}
                                     />
                                 </div>
                                 <span>{themeOpt.name}</span>
@@ -333,7 +342,8 @@ export function SettingsScreen(props: SettingsScreenProps) {
                 onClose={() => setPendingImport(null)}
             >
                 <p className="mb-4 font-medium">
-                    Are you sure you want to import this save file? This will overwrite your existing statistics and settings.
+                    Are you sure you want to import this save file? This will
+                    overwrite your existing statistics and settings.
                 </p>
                 <div className="flex gap-3">
                     <Button fullWidth onClick={handleConfirmImport}>
@@ -378,4 +388,3 @@ export function SettingsScreen(props: SettingsScreenProps) {
         </PageContainer>
     );
 }
-

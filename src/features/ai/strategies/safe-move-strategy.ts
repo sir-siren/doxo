@@ -28,4 +28,3 @@ export function createSafeMoveStrategy(rng: Rng = Math.random): AiStrategy {
         },
     };
 }
-

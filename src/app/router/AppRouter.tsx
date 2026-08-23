@@ -2,10 +2,17 @@ import { useCallback, useState } from "react";
 import { WelcomeScreen } from "@/pages/welcome-screen/WelcomeScreen";
 import { SetupScreen, type GameMode } from "@/pages/setup-screen";
 import { HowToPlayScreen } from "@/pages/how-to-play-screen";
-import { StatisticsScreen, type StatisticsData } from "@/pages/statistics-screen";
+import {
+    StatisticsScreen,
+    type StatisticsData,
+} from "@/pages/statistics-screen";
 import { SettingsScreen } from "@/pages/settings-screen";
 import { GameScreen } from "@/pages/game-screen/GameScreen";
-import type { BoardShape, Difficulty, PlayerId } from "@/features/game/types/game.types";
+import type {
+    BoardShape,
+    Difficulty,
+    PlayerId,
+} from "@/features/game/types/game.types";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import {
     recordGameResult,
@@ -20,7 +27,10 @@ import {
     setSettingsState,
     resetSettings,
 } from "@/features/settings/state/settings.slice";
-import { savePersistedState, type PersistedState } from "@/shared/lib/persistence/storage";
+import {
+    savePersistedState,
+    type PersistedState,
+} from "@/shared/lib/persistence/storage";
 
 export type ScreenName =
     "welcome" | "setup" | "game" | "how-to-play" | "settings" | "statistics";
@@ -186,8 +196,12 @@ export function AppRouter() {
                 motion={settingsState.reducedMotionOverride}
                 onThemeChange={(theme) => dispatch(setTheme(theme))}
                 onSoundChange={(enabled) => dispatch(setSoundEnabled(enabled))}
-                onHapticsChange={(enabled) => dispatch(setHapticsEnabled(enabled))}
-                onMotionChange={(motion) => dispatch(setReducedMotionOverride(motion))}
+                onHapticsChange={(enabled) =>
+                    dispatch(setHapticsEnabled(enabled))
+                }
+                onMotionChange={(motion) =>
+                    dispatch(setReducedMotionOverride(motion))
+                }
                 onResetStatistics={() => dispatch(resetStatistics())}
                 onResetSettings={() => dispatch(resetSettings())}
                 onImportData={handleImportData}

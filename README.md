@@ -45,29 +45,35 @@ Doxo is a Dots & Boxes web game. Grab a friend and play on the same screen, or p
 ## 🚀 Usage
 
 ### 1. Clone the repository
+
 ```bash
 git clone https://github.com/sir-siren/doxo.git
 cd doxo
 ```
 
 ### 2. Install dependencies
+
 ```bash
 bun install
 # or npm install / pnpm install
 ```
 
 ### 3. Start the dev server
+
 ```bash
 bun run dev
 ```
+
 Then open `http://localhost:5173` in your browser.
 
 ### 4. Build for production
+
 ```bash
 bun run build
 ```
 
 ### 5. Run tests and lint
+
 ```bash
 bun run test        # Vitest suite
 bun run typecheck   # TypeScript compilation check
@@ -76,24 +82,24 @@ bun run lint        # Oxlint
 
 ## 🎮 Controls
 
-| Input / Action | Interaction | Description |
-| :--- | :--- | :--- |
-| **Mouse / Touch** | Click or tap an edge line | Claims that line for the current player |
-| **Keyboard Focus** | <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | Moves focus between unclaimed edges on the board |
-| **Keyboard Claim** | <kbd>Enter</kbd> or <kbd>Space</kbd> | Claims whichever edge is currently focused |
-| **Undo** | Click the **Undo** button | Reverts the last turn (both moves in AI mode) |
-| **Dot Click** | Click a grid dot | Does nothing gameplay-wise, just shows a quick error toast |
+| Input / Action     | Interaction                                        | Description                                                |
+| :----------------- | :------------------------------------------------- | :--------------------------------------------------------- |
+| **Mouse / Touch**  | Click or tap an edge line                          | Claims that line for the current player                    |
+| **Keyboard Focus** | <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | Moves focus between unclaimed edges on the board           |
+| **Keyboard Claim** | <kbd>Enter</kbd> or <kbd>Space</kbd>               | Claims whichever edge is currently focused                 |
+| **Undo**           | Click the **Undo** button                          | Reverts the last turn (both moves in AI mode)              |
+| **Dot Click**      | Click a grid dot                                   | Does nothing gameplay-wise, just shows a quick error toast |
 
 ## 📊 Technical Specs & Constants
 
-| Category | Constant / Setting | Default Value | Location |
-| :--- | :--- | :--- | :--- |
-| **Grid Bounds** | `BOARD_SIZE_MIN` / `BOARD_SIZE_MAX` | `3` / `8` rows & cols | `src/features/settings/state/settings.slice.ts` |
-| **Board Geometry** | `MIN_CELL` / `MAX_BOARD` | `32px` / `960px` | `src/features/game/hooks/useGameBoard.ts` |
-| **Hitbox Buffer** | `Math.max(32, strokeWidth + 24)` | $\ge 32\text{px}$ touch target | `src/features/game/components/BoardEdge.tsx` |
-| **History Limit** | `MAX_UNDO_HISTORY` | `120` moves | `src/features/game/state/game.slice.ts` |
-| **Storage Key** | `STORAGE_KEY` / `SCHEMA_VERSION` | `doxo:app-state` / `v1` | `src/shared/lib/persistence/storage.ts` |
-| **AI Think Delay** | Turn timer delay | `600ms` | `src/pages/game-screen/GameScreen.tsx` |
+| Category           | Constant / Setting                  | Default Value                  | Location                                        |
+| :----------------- | :---------------------------------- | :----------------------------- | :---------------------------------------------- |
+| **Grid Bounds**    | `BOARD_SIZE_MIN` / `BOARD_SIZE_MAX` | `3` / `8` rows & cols          | `src/features/settings/state/settings.slice.ts` |
+| **Board Geometry** | `MIN_CELL` / `MAX_BOARD`            | `32px` / `960px`               | `src/features/game/hooks/useGameBoard.ts`       |
+| **Hitbox Buffer**  | `Math.max(32, strokeWidth + 24)`    | $\ge 32\text{px}$ touch target | `src/features/game/components/BoardEdge.tsx`    |
+| **History Limit**  | `MAX_UNDO_HISTORY`                  | `120` moves                    | `src/features/game/state/game.slice.ts`         |
+| **Storage Key**    | `STORAGE_KEY` / `SCHEMA_VERSION`    | `doxo:app-state` / `v1`        | `src/shared/lib/persistence/storage.ts`         |
+| **AI Think Delay** | Turn timer delay                    | `600ms`                        | `src/pages/game-screen/GameScreen.tsx`          |
 
 ## 🔧 Customization
 
@@ -110,6 +116,6 @@ MIT licensed. See the [LICENSE](LICENSE) file for the details.
 
 <div align="center">
 
- **If you enjoy it, a star on GitHub goes a long way.** ⭐
+**If you enjoy it, a star on GitHub goes a long way.** ⭐
 
 </div>

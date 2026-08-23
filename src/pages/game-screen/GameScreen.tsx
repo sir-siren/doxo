@@ -8,7 +8,11 @@ import type {
     Player,
     BoardShape,
 } from "@/features/game/types/game.types";
-import { createAiStrategy, resolveAdaptiveDifficulty, type AiStrategy } from "@/features/ai";
+import {
+    createAiStrategy,
+    resolveAdaptiveDifficulty,
+    type AiStrategy,
+} from "@/features/ai";
 import { GameBoard } from "@/features/game/components/GameBoard";
 import { Scoreboard } from "@/features/game/components/Scoreboard";
 import { TurnIndicator } from "@/features/game/components/TurnIndicator";
@@ -42,7 +46,11 @@ interface GameScreenProps {
     onBack?: () => void;
     onNewGame: () => void;
     onReplay: () => void;
-    onGameOver?: (winner: "p1" | "p2" | "draw", p1Score: number, p2Score: number) => void;
+    onGameOver?: (
+        winner: "p1" | "p2" | "draw",
+        p1Score: number,
+        p2Score: number,
+    ) => void;
 }
 
 function vibrate(pattern: number | number[], enabled: boolean): void {
@@ -85,7 +93,9 @@ export function GameScreen({
 
     const effectiveDifficulty = useMemo<Difficulty>(() => {
         if (config.difficulty === "adaptive") {
-            return resolveAdaptiveDifficulty(statsState, { boardSize: config.rows });
+            return resolveAdaptiveDifficulty(statsState, {
+                boardSize: config.rows,
+            });
         }
         return config.difficulty;
     }, [config.difficulty, config.rows, statsState]);
@@ -101,7 +111,14 @@ export function GameScreen({
                 players: [config.playerOne, config.playerTwo],
             }),
         );
-    }, [dispatch, config.rows, config.cols, config.shape, config.playerOne, config.playerTwo]);
+    }, [
+        dispatch,
+        config.rows,
+        config.cols,
+        config.shape,
+        config.playerOne,
+        config.playerTwo,
+    ]);
 
     useEffect(() => {
         return () => {
@@ -111,7 +128,12 @@ export function GameScreen({
     }, []);
 
     useEffect(() => {
-        if (state && state.status === "finished" && state.winner !== null && !reportedGameOverRef.current) {
+        if (
+            state &&
+            state.status === "finished" &&
+            state.winner !== null &&
+            !reportedGameOverRef.current
+        ) {
             reportedGameOverRef.current = true;
             playVictorySound(soundEnabled);
             vibrate([40, 60, 40, 60, 100], hapticsEnabled);
@@ -163,10 +185,11 @@ export function GameScreen({
             const edgeId = strategy.selectMove(state, validMoves);
             if (edgeId === null) return;
 
-            const completes = detectCompletedBoxes(
-                { edges: state.edges, boxes: state.boxes },
-                edgeId,
-            ).length > 0;
+            const completes =
+                detectCompletedBoxes(
+                    { edges: state.edges, boxes: state.boxes },
+                    edgeId,
+                ).length > 0;
 
             if (completes) {
                 playBoxCompletedSound(soundEnabled);
@@ -190,13 +213,18 @@ export function GameScreen({
     const handleSelectEdge = useCallback(
         (edgeId: string) => {
             if (!state || state.status !== "playing") return;
-            if (state.edges[edgeId] === undefined || state.edges[edgeId]?.owner !== null) return;
+            if (
+                state.edges[edgeId] === undefined ||
+                state.edges[edgeId]?.owner !== null
+            )
+                return;
             if (config.mode === "ai" && state.currentPlayer === "p2") return;
 
-            const completes = detectCompletedBoxes(
-                { edges: state.edges, boxes: state.boxes },
-                edgeId,
-            ).length > 0;
+            const completes =
+                detectCompletedBoxes(
+                    { edges: state.edges, boxes: state.boxes },
+                    edgeId,
+                ).length > 0;
 
             if (completes) {
                 playBoxCompletedSound(soundEnabled);
@@ -342,7 +370,9 @@ export function GameScreen({
                     {config.mode === "ai" && (
                         <p className="mt-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                             AI Level: {effectiveDifficulty}
-                            {config.difficulty === "adaptive" ? " (Adaptive)" : ""}
+                            {config.difficulty === "adaptive"
+                                ? " (Adaptive)"
+                                : ""}
                         </p>
                     )}
                 </div>

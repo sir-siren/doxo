@@ -9,4 +9,3 @@ export const calculateScores = (state: GameState): ScoreMap => {
     }
     return scores;
 };
-

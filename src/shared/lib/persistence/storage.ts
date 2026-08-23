@@ -1,4 +1,7 @@
-import type { SettingsState, ThemeName } from "@/features/settings/state/settings.types";
+import type {
+    SettingsState,
+    ThemeName,
+} from "@/features/settings/state/settings.types";
 import { initialSettingsState } from "@/features/settings/state/settings.slice";
 import type { StatisticsState } from "@/features/statistics/state/statistics.types";
 import { initialStatisticsState } from "@/features/statistics/state/statistics.slice";
@@ -16,7 +19,13 @@ export interface PersistedState {
     exportedAt?: string;
 }
 
-const DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard", "insane", "adaptive"];
+const DIFFICULTIES: Difficulty[] = [
+    "easy",
+    "medium",
+    "hard",
+    "insane",
+    "adaptive",
+];
 const THEMES: ThemeName[] = ["default", "minimal", "dark", "colorblind"];
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -125,7 +134,10 @@ export const migrate = (raw: Record<string, unknown>): PersistedState => {
                 schemaVersion: SCHEMA_VERSION,
                 settings: parseSettings(raw["settings"]),
                 statistics: parseStatistics(raw["statistics"]),
-                exportedAt: typeof raw["exportedAt"] === "string" ? raw["exportedAt"] : undefined,
+                exportedAt:
+                    typeof raw["exportedAt"] === "string"
+                        ? raw["exportedAt"]
+                        : undefined,
             };
         default:
             // Unknown or missing version, reset to defaults
@@ -182,27 +194,48 @@ export const validateAndParseSaveData = (
     try {
         const parsed: unknown = JSON.parse(rawJson);
         if (!isRecord(parsed)) {
-            return { valid: false, error: "Invalid file format: root object is missing." };
+            return {
+                valid: false,
+                error: "Invalid file format: root object is missing.",
+            };
         }
-        if (!("schemaVersion" in parsed) || !isFiniteNumber(parsed["schemaVersion"])) {
-            return { valid: false, error: "Invalid backup file: schemaVersion is missing or invalid." };
+        if (
+            !("schemaVersion" in parsed) ||
+            !isFiniteNumber(parsed["schemaVersion"])
+        ) {
+            return {
+                valid: false,
+                error: "Invalid backup file: schemaVersion is missing or invalid.",
+            };
         }
         if (!("settings" in parsed) || !isRecord(parsed["settings"])) {
-            return { valid: false, error: "Invalid backup file: settings payload is missing." };
+            return {
+                valid: false,
+                error: "Invalid backup file: settings payload is missing.",
+            };
         }
         if (!("statistics" in parsed) || !isRecord(parsed["statistics"])) {
-            return { valid: false, error: "Invalid backup file: statistics payload is missing." };
+            return {
+                valid: false,
+                error: "Invalid backup file: statistics payload is missing.",
+            };
         }
 
         const data = migrate(parsed);
         return { valid: true, data };
     } catch {
-        return { valid: false, error: "Malformed JSON file. Please select a valid Doxo backup file." };
+        return {
+            valid: false,
+            error: "Malformed JSON file. Please select a valid Doxo backup file.",
+        };
     }
 };
 
 /** Triggers a browser file download for a JSON string. */
-export const triggerJsonDownload = (filename: string, jsonContent: string): void => {
+export const triggerJsonDownload = (
+    filename: string,
+    jsonContent: string,
+): void => {
     const blob = new Blob([jsonContent], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -213,4 +246,3 @@ export const triggerJsonDownload = (filename: string, jsonContent: string): void
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 };
-

@@ -46,7 +46,11 @@ const buildEdge = (
     ...(coords ?? {}),
 });
 
-function isBoxInShape(row: number, col: number, dimensions: BoardDimensions): boolean {
+function isBoxInShape(
+    row: number,
+    col: number,
+    dimensions: BoardDimensions,
+): boolean {
     const shape: BoardShape = dimensions.shape ?? "rectangle";
     if (shape === "rectangle" || shape === "hex") {
         return true;
@@ -131,8 +135,10 @@ function createHexBoard(dimensions: BoardDimensions): {
             for (let i = 0; i < 6; i += 1) {
                 const angleDeg = 30 + 60 * i;
                 const angleRad = (Math.PI / 180) * angleDeg;
-                const vx = Math.round((cx + R * Math.cos(angleRad)) * 1000) / 1000;
-                const vy = Math.round((cy + R * Math.sin(angleRad)) * 1000) / 1000;
+                const vx =
+                    Math.round((cx + R * Math.cos(angleRad)) * 1000) / 1000;
+                const vy =
+                    Math.round((cy + R * Math.sin(angleRad)) * 1000) / 1000;
                 vertCoords.push({ x: vx, y: vy });
                 vertIds.push(`(${vx},${vy})`);
             }

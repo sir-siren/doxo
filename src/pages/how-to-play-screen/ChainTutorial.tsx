@@ -20,12 +20,16 @@ interface Scenario {
 const DEFAULT_SCENARIO: Scenario = {
     id: 1,
     title: "Lesson 1: Making Safe Moves",
-    description: "In the early game, claim edges that create the 1st or 2nd side of a box. Never make the 3rd side unless forced!",
-    instructions: "Find and claim the safe edge that does NOT create a dangerous 3-sided box.",
+    description:
+        "In the early game, claim edges that create the 1st or 2nd side of a box. Never make the 3rd side unless forced!",
+    instructions:
+        "Find and claim the safe edge that does NOT create a dangerous 3-sided box.",
     setupMoves: ["H-0-0", "V-0-0", "H-1-0", "H-0-1"],
     targetEdgeId: "V-1-1",
-    successMessage: "Excellent! That move created only a 2nd side, leaving your opponent no easy captures.",
-    failureMessage: "Watch out! That move created a 3rd side on a box, allowing your opponent to score immediately.",
+    successMessage:
+        "Excellent! That move created only a 2nd side, leaving your opponent no easy captures.",
+    failureMessage:
+        "Watch out! That move created a 3rd side on a box, allowing your opponent to score immediately.",
     dimensions: { rows: 2, cols: 2 },
 };
 
@@ -34,34 +38,46 @@ const SCENARIOS: readonly Scenario[] = [
     {
         id: 2,
         title: "Lesson 2: Seizing 3-Sided Boxes",
-        description: "When a box has 3 sides completed, closing the 4th side scores 1 point and awards you an extra turn immediately.",
-        instructions: "Close the open 3-sided box to claim it and keep the turn.",
+        description:
+            "When a box has 3 sides completed, closing the 4th side scores 1 point and awards you an extra turn immediately.",
+        instructions:
+            "Close the open 3-sided box to claim it and keep the turn.",
         setupMoves: ["H-0-0", "V-0-0", "H-1-0"],
         targetEdgeId: "V-0-1",
-        successMessage: "Great job! You claimed the box and gained the bonus turn to keep playing.",
-        failureMessage: "Missed opportunity! That 3-sided box was waiting to be claimed.",
+        successMessage:
+            "Great job! You claimed the box and gained the bonus turn to keep playing.",
+        failureMessage:
+            "Missed opportunity! That 3-sided box was waiting to be claimed.",
         dimensions: { rows: 2, cols: 2 },
     },
     {
         id: 3,
         title: "Lesson 3: Chain Sacrifice",
-        description: "Sacrificing a small 2-box corridor is often better than breaking open a huge multi-box chain for your opponent.",
-        instructions: "Play the sacrifice move on the small branch to preserve your control over the board.",
+        description:
+            "Sacrificing a small 2-box corridor is often better than breaking open a huge multi-box chain for your opponent.",
+        instructions:
+            "Play the sacrifice move on the small branch to preserve your control over the board.",
         setupMoves: ["H-0-0", "V-0-0", "V-0-2", "H-1-1", "V-1-0", "H-2-1"],
         targetEdgeId: "H-1-0",
-        successMessage: "Masterful! By giving away a tiny 2-box sacrifice, you force your opponent to open up the remaining board for you.",
-        failureMessage: "That opened a longer chain! Sacrificing the shorter side keeps you in control.",
+        successMessage:
+            "Masterful! By giving away a tiny 2-box sacrifice, you force your opponent to open up the remaining board for you.",
+        failureMessage:
+            "That opened a longer chain! Sacrificing the shorter side keeps you in control.",
         dimensions: { rows: 2, cols: 2 },
     },
     {
         id: 4,
         title: "Lesson 4: Chain Sweeping",
-        description: "Because every completed box gives another turn, a connected series of 3-sided boxes can be swept in a single turn!",
-        instructions: "Start the cascade by claiming the first open box edge and sweeping through.",
+        description:
+            "Because every completed box gives another turn, a connected series of 3-sided boxes can be swept in a single turn!",
+        instructions:
+            "Start the cascade by claiming the first open box edge and sweeping through.",
         setupMoves: ["H-0-0", "V-0-0", "H-1-0", "V-0-1", "H-1-1", "H-0-1"],
         targetEdgeId: "V-0-2",
-        successMessage: "Brilliant sweep! You chained consecutive bonus turns to claim the entire section.",
-        failureMessage: "Try starting with the open chain edge to trigger consecutive box captures!",
+        successMessage:
+            "Brilliant sweep! You chained consecutive bonus turns to claim the entire section.",
+        failureMessage:
+            "Try starting with the open chain edge to trigger consecutive box captures!",
         dimensions: { rows: 2, cols: 2 },
     },
 ];
@@ -168,7 +184,8 @@ export function ChainTutorial() {
                 </div>
 
                 <div className="rounded-xl border-2 border-border bg-surface-elevated p-3 text-xs font-bold text-foreground">
-                    🎯 <span className="font-extrabold uppercase">Goal:</span> {scenario.instructions}
+                    🎯 <span className="font-extrabold uppercase">Goal:</span>{" "}
+                    {scenario.instructions}
                 </div>
 
                 {/* Interactive Board Sandbox */}
@@ -200,11 +217,18 @@ export function ChainTutorial() {
 
                 {/* Action controls */}
                 <div className="flex gap-2">
-                    <Button variant="secondary" fullWidth onClick={resetCurrent}>
+                    <Button
+                        variant="secondary"
+                        fullWidth
+                        onClick={resetCurrent}
+                    >
                         Reset Lesson
                     </Button>
                     {feedback?.type === "success" && !isLast && (
-                        <Button fullWidth onClick={() => handleSelectStep(currentStep + 1)}>
+                        <Button
+                            fullWidth
+                            onClick={() => handleSelectStep(currentStep + 1)}
+                        >
                             Next Lesson →
                         </Button>
                     )}

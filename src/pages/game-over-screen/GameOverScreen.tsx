@@ -35,7 +35,10 @@ export function GameOverScreen({
                 Game Over
             </h1>
             <div className="animate-badge-pop flex flex-col items-center gap-1">
-                <p className="text-center text-2xl font-black uppercase" role="status">
+                <p
+                    className="text-center text-2xl font-black uppercase"
+                    role="status"
+                >
                     {headline}
                 </p>
                 {difficultyLabel && (

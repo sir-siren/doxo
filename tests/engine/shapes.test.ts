@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { createBoard, boxEdges } from "@/features/game/engine/board-factory";
 import { detectCompletedBoxes } from "@/features/game/engine/box-detector";
-import { applyMove, createGame, getValidMoves } from "@/features/game/engine/game-engine";
+import {
+    applyMove,
+    createGame,
+    getValidMoves,
+} from "@/features/game/engine/game-engine";
 import type { Player } from "@/features/game/types/game.types";
 
 const players: [Player, Player] = [
@@ -25,12 +29,18 @@ describe("board shapes", () => {
     });
 
     it("detects completed boxes correctly on triangle board", () => {
-        let state = createGame({ rows: 3, cols: 3, shape: "triangle" }, players);
+        let state = createGame(
+            { rows: 3, cols: 3, shape: "triangle" },
+            players,
+        );
         state = applyMove(state, { edgeId: "H-0-0", player: "p1" }).state;
         state = applyMove(state, { edgeId: "H-1-0", player: "p2" }).state;
         state = applyMove(state, { edgeId: "V-0-0", player: "p1" }).state;
 
-        const completed = detectCompletedBoxes({ edges: state.edges, boxes: state.boxes }, "V-0-1");
+        const completed = detectCompletedBoxes(
+            { edges: state.edges, boxes: state.boxes },
+            "V-0-1",
+        );
         expect(completed).toContain("0-0");
     });
 

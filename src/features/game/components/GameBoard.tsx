@@ -41,7 +41,10 @@ export function GameBoard({
             : state.players[1]?.name;
 
     return (
-        <div ref={containerRef} className="flex w-full items-center justify-center">
+        <div
+            ref={containerRef}
+            className="flex w-full items-center justify-center"
+        >
             <p className="sr-only" role="status" aria-live="polite">
                 {state.status === "finished"
                     ? `Game over. Final score ${state.players[0]?.name}: ${state.scores.p1}, ${state.players[1]?.name}: ${state.scores.p2}.`

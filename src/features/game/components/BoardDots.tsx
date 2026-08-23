@@ -1,5 +1,9 @@
 import { memo } from "react";
-import type { BoardDimensions, Edge, EdgeId } from "@/features/game/types/game.types";
+import type {
+    BoardDimensions,
+    Edge,
+    EdgeId,
+} from "@/features/game/types/game.types";
 import { edgeCoordinates, type BoardGeometry } from "../hooks/useGameBoard";
 
 interface BoardDotsProps {
@@ -90,4 +94,3 @@ function BoardDotsInner({
 }
 
 export const BoardDots = memo(BoardDotsInner);
-

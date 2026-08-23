@@ -31,18 +31,12 @@ export const initialGameState: GameSliceState = {
 const isAiGame = (game: GameState): boolean =>
     game.players.some((player) => player.kind === "ai");
 
-const pushBounded = (
-    history: GameState[],
-    entry: GameState,
-): GameState[] => {
+const pushBounded = (history: GameState[], entry: GameState): GameState[] => {
     const next = [...history, entry];
     return next.length > MAX_UNDO_HISTORY ? next.slice(1) : next;
 };
 
-const undoRestoreIndex = (
-    current: GameState,
-    past: GameState[],
-): number => {
+const undoRestoreIndex = (current: GameState, past: GameState[]): number => {
     let index = past.length - 1;
     if (!isAiGame(current)) return index;
 

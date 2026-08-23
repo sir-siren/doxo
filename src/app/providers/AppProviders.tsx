@@ -5,12 +5,17 @@ import { useAppSelector } from "@/app/store/hooks";
 
 function ThemeSync({ children }: { readonly children: ReactNode }) {
     const theme = useAppSelector((state) => state.settings.theme);
-    const motion = useAppSelector((state) => state.settings.reducedMotionOverride);
+    const motion = useAppSelector(
+        (state) => state.settings.reducedMotionOverride,
+    );
 
     useEffect(() => {
         if (typeof document !== "undefined") {
             document.documentElement.setAttribute("data-theme", theme);
-            document.documentElement.setAttribute("data-reduced-motion", motion);
+            document.documentElement.setAttribute(
+                "data-reduced-motion",
+                motion,
+            );
         }
     }, [theme, motion]);
 

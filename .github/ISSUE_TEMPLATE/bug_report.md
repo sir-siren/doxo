@@ -10,6 +10,7 @@ assignees: sir-siren
 A clear description of what's going wrong.
 
 **Steps to reproduce**
+
 1. Go to '...'
 2. Click on '...'
 3. See the issue
@@ -21,6 +22,7 @@ What you expected to happen instead.
 If it's a visual bug, a screenshot or screen recording helps a lot.
 
 **Environment**
+
 - Browser + version: [e.g. Chrome 128]
 - OS: [e.g. Windows 11, macOS, Android]
 - Screen size / device: [e.g. desktop, iPhone 14]

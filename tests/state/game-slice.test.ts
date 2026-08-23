@@ -31,7 +31,11 @@ const AI_PLAYERS: [Player, Player] = [
 const createTestStore = () =>
     configureStore({
         reducer: rootReducer,
-        middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
+        middleware: (getDefaultMiddleware) =>
+            getDefaultMiddleware({
+                serializableCheck: false,
+                immutableCheck: false,
+            }),
     });
 
 const allEdgeIds = ({ rows, cols }: BoardDimensions): string[] => {

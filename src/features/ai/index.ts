@@ -34,4 +34,3 @@ export { createSafeMoveStrategy } from "@/features/ai/strategies/safe-move-strat
 export { createStrategicStrategy } from "@/features/ai/strategies/strategic-strategy";
 export { createMinimaxStrategy } from "@/features/ai/strategies/minimax-strategy";
 export { resolveAdaptiveDifficulty } from "@/features/ai/adaptive-difficulty";
-

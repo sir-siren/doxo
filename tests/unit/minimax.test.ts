@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { createMinimaxStrategy } from "@/features/ai/strategies/minimax-strategy";
-import { applyMove, createGame, getValidMoves } from "@/features/game/engine/game-engine";
+import {
+    applyMove,
+    createGame,
+    getValidMoves,
+} from "@/features/game/engine/game-engine";
 import type { Player } from "@/features/game/types/game.types";
 
 const players: [Player, Player] = [
@@ -45,11 +49,15 @@ describe("minimax insane strategy", () => {
         let moveCount = 0;
         while (state.status === "playing" && moveCount < 50) {
             const valid = getValidMoves(state);
-            const currentStrategy = state.currentPlayer === "p1" ? p1Strategy : p2Strategy;
+            const currentStrategy =
+                state.currentPlayer === "p1" ? p1Strategy : p2Strategy;
             const chosen = currentStrategy.selectMove(state, valid);
             expect(chosen).not.toBeNull();
             if (!chosen) break;
-            state = applyMove(state, { edgeId: chosen, player: state.currentPlayer }).state;
+            state = applyMove(state, {
+                edgeId: chosen,
+                player: state.currentPlayer,
+            }).state;
             moveCount += 1;
         }
 

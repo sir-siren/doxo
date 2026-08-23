@@ -7,4 +7,3 @@ export const getValidMoves = (state: GameState): EdgeId[] =>
     Object.values(state.edges)
         .filter((edge) => edge.owner === null)
         .map((edge) => edge.id);
-
