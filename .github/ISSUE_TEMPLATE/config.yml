@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Ask a question / discuss an idea
+    url: https://github.com/sir-siren/doxo/discussions
+    about: For general questions or open-ended discussion, please use Discussions instead of an issue.

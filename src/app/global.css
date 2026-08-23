@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@theme {
+    --font-sans:
+        ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    /* Neo-brutalist pastel design tokens */
+    --color-background: #fdfcf7;
+    --color-surface: #ffffff;
+    --color-surface-elevated: #fffdf5;
+    --color-foreground: #1f2933;
+    --color-muted-foreground: #5f6b76;
+    --color-border: #1f2933;
+    --color-shadow: #1f2933;
+
+    --color-player-one: #7fd8de;
+    --color-player-one-soft: #d3f2f4;
+    --color-player-two: #f9b8c6;
+    --color-player-two-soft: #fce4ea;
+
+    --color-success: #9fdfbf;
+    --color-warning: #f9e0a2;
+    --color-danger: #f5a3a3;
+
+    --shadow-brutal: 4px 4px 0 0 #1f2933;
+    --shadow-brutal-sm: 2px 2px 0 0 #1f2933;
+
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes edge-activate-spring {
+    0% {
+        transform: scale(0.6);
+        opacity: 0.6;
+    }
+    65% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.animate-edge-spring {
+    animation: edge-activate-spring 350ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@layer base {
+    html {
+        @apply bg-background text-foreground font-sans antialiased;
+        scrollbar-gutter: stable;
+    }
+
+    body {
+        min-height: 100dvh;
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        overscroll-behavior-y: none;
+    }
+
+    :focus-visible {
+        outline: 3px solid var(--color-foreground);
+        outline-offset: 2px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

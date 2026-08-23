@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "oxc.oxc-vscode",
+        "oven.bun-vscode",
+        "editorconfig.editorconfig",
+        "typescriptteam.native-preview",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "christian-kohler.path-intellisense",
+        "christian-kohler.npm-intellisense"
+    ]
+}

@@ -1,0 +1,21 @@
+# CODEOWNERS
+# These owners are automatically requested for review on any PR that
+# touches the matching paths. Order matters: later matches win.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything in the repo
+*                            @sir-siren
+
+# Game engine and AI logic — core gameplay behavior
+/src/features/game/engine/   @sir-siren
+/src/features/ai/            @sir-siren
+
+# Redux state and store wiring
+/src/app/store/              @sir-siren
+/src/features/*/state/       @sir-siren
+
+# Build, tooling, and CI configuration
+/vite.config.ts              @sir-siren
+/vitest.config.ts            @sir-siren
+/.oxlintrc.json              @sir-siren
+/.github/                    @sir-siren
