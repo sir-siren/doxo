@@ -28,9 +28,6 @@ function BoardEdgeInner({
         ? playerEdgeClass(edge.owner)
         : edgePreviewClass(currentPlayer);
 
-    const midX = (x1 + x2) / 2;
-    const midY = (y1 + y2) / 2;
-
     return (
         <g className={isSelectable ? "group" : ""}>
             <line
@@ -40,13 +37,8 @@ function BoardEdgeInner({
                 y2={y2}
                 className={
                     claimed
-                        ? `${strokeClass} animate-edge-spring pointer-events-none`
+                        ? `${strokeClass} pointer-events-none`
                         : `${strokeClass} transition-all duration-200 opacity-20 group-hover:opacity-50 hover:opacity-50 pointer-events-none`
-                }
-                style={
-                    claimed
-                        ? { transformOrigin: `${midX}px ${midY}px` }
-                        : undefined
                 }
                 strokeWidth={geometry.edgeStrokeWidth}
                 strokeLinecap="round"

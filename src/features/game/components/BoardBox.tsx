@@ -30,8 +30,6 @@ function BoardBoxInner({ row, col, owner, geometry }: BoardBoxProps) {
     return (
         <g
             aria-label={`Box row ${row + 1} column ${col + 1}, owned by ${owner === "p1" ? "Player 1" : "Player 2"}`}
-            style={{ transformOrigin: `${cx}px ${cy}px` }}
-            className="animate-box-spring"
         >
             {geometry.shape === "hex" ? (
                 <polygon
@@ -60,7 +58,7 @@ function BoardBoxInner({ row, col, owner, geometry }: BoardBoxProps) {
                 y={cy}
                 textAnchor="middle"
                 dominantBaseline="central"
-                className={`${OWNER_TEXT[owner]} select-none font-black animate-badge-pop`}
+                className={`${OWNER_TEXT[owner]} select-none font-black`}
                 fontSize={Math.max(13, geometry.cellSize * 0.32)}
             >
                 {owner === "p1" ? "P1" : "P2"}

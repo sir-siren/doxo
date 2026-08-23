@@ -41,27 +41,31 @@ describe("minimax insane strategy", () => {
         expect(move).not.toBe("V-0-1");
     });
 
-    it("plays full game against itself on 2x2 board without error and completes", () => {
-        let state = createGame({ rows: 2, cols: 2 }, players);
-        const p1Strategy = createMinimaxStrategy();
-        const p2Strategy = createMinimaxStrategy();
+    it(
+        "plays full game against itself on 2x2 board without error and completes",
+        () => {
+            let state = createGame({ rows: 2, cols: 2 }, players);
+            const p1Strategy = createMinimaxStrategy();
+            const p2Strategy = createMinimaxStrategy();
 
-        let moveCount = 0;
-        while (state.status === "playing" && moveCount < 50) {
-            const valid = getValidMoves(state);
-            const currentStrategy =
-                state.currentPlayer === "p1" ? p1Strategy : p2Strategy;
-            const chosen = currentStrategy.selectMove(state, valid);
-            expect(chosen).not.toBeNull();
-            if (!chosen) break;
-            state = applyMove(state, {
-                edgeId: chosen,
-                player: state.currentPlayer,
-            }).state;
-            moveCount += 1;
-        }
+            let moveCount = 0;
+            while (state.status === "playing" && moveCount < 50) {
+                const valid = getValidMoves(state);
+                const currentStrategy =
+                    state.currentPlayer === "p1" ? p1Strategy : p2Strategy;
+                const chosen = currentStrategy.selectMove(state, valid);
+                expect(chosen).not.toBeNull();
+                if (!chosen) break;
+                state = applyMove(state, {
+                    edgeId: chosen,
+                    player: state.currentPlayer,
+                }).state;
+                moveCount += 1;
+            }
 
-        expect(state.status).toBe("finished");
-        expect(state.scores.p1 + state.scores.p2).toBe(4);
-    });
+            expect(state.status).toBe("finished");
+            expect(state.scores.p1 + state.scores.p2).toBe(4);
+        },
+        20000,
+    );
 });

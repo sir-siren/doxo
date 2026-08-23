@@ -2,15 +2,13 @@ import { useCallback, useState } from "react";
 import { WelcomeScreen } from "@/pages/welcome-screen/WelcomeScreen";
 import { SetupScreen, type GameMode } from "@/pages/setup-screen";
 import { HowToPlayScreen } from "@/pages/how-to-play-screen";
-import {
-    StatisticsScreen,
-    type StatisticsData,
-} from "@/pages/statistics-screen";
+import { StatisticsScreen } from "@/pages/statistics-screen";
 import { SettingsScreen } from "@/pages/settings-screen";
 import { GameScreen } from "@/pages/game-screen/GameScreen";
 import type {
     BoardShape,
     Difficulty,
+    Player,
     PlayerId,
 } from "@/features/game/types/game.types";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
@@ -70,18 +68,51 @@ export function AppRouter() {
     const goHome = useCallback(() => setScreen("welcome"), []);
 
     const handleGameOver = useCallback(
-        (winner: "p1" | "p2" | "draw", p1Score: number) => {
-            const outcome =
-                winner === "draw" ? "draw" : winner === "p1" ? "win" : "loss";
+        (
+            winner: "p1" | "p2" | "draw",
+            p1Score: number,
+            p2Score: number,
+        ) => {
+            const playerOne: Player = {
+                id: "p1",
+                name: setup.playerOneName || "Player 1",
+                kind: "human",
+            };
+            const playerTwo: Player =
+                setup.mode === "ai"
+                    ? {
+                          id: "p2",
+                          name: setup.playerTwoName || "Computer",
+                          kind: "ai",
+                          difficulty: setup.difficulty,
+                      }
+                    : {
+                          id: "p2",
+                          name: setup.playerTwoName || "Player 2",
+                          kind: "human",
+                      };
+
             dispatch(
                 recordGameResult({
-                    outcome,
+                    mode: setup.mode,
                     difficulty: setup.difficulty,
-                    boxesClaimedByHuman: p1Score,
+                    shape: setup.shape,
+                    boardSize: setup.boardSize,
+                    players: [playerOne, playerTwo],
+                    scores: { p1: p1Score, p2: p2Score },
+                    winner,
                 }),
             );
         },
-        [dispatch, setup.difficulty],
+        [
+            dispatch,
+            setup.mode,
+            setup.difficulty,
+            setup.shape,
+            setup.boardSize,
+            setup.playerOneName,
+            setup.playerTwoName,
+        ],
     );
 
     const handleImportData = useCallback(
@@ -210,27 +241,15 @@ export function AppRouter() {
         );
     }
 
-    const statsData: StatisticsData = {
-        gamesPlayed: statsState.gamesPlayed,
-        wins: statsState.wins,
-        losses: statsState.losses,
-        draws: statsState.draws,
-        totalBoxesClaimed: statsState.totalBoxesClaimed,
-        winRate:
-            statsState.gamesPlayed > 0
-                ? statsState.wins / statsState.gamesPlayed
-                : 0,
-        currentStreak: statsState.currentStreak,
-        longestStreak: statsState.longestStreak,
-    };
-
     return (
         <StatisticsScreen
-            statistics={statsData}
+            statistics={statsState}
             onReset={() => dispatch(resetStatistics())}
             onBack={goHome}
+            onPlay={() => setScreen("setup")}
         />
     );
 }
 
 export type { PlayerId };
+

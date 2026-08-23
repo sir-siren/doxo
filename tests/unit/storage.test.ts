@@ -68,4 +68,71 @@ describe("save data export and import", () => {
         expect(migrated.settings).toEqual(initialSettingsState);
         expect(migrated.statistics).toEqual(initialStatisticsState);
     });
+
+    it("safely parses statistics with match records retaining up to 50 recent matches", () => {
+        const rawMatches = Array.from({ length: 60 }, (_, i) => ({
+            id: `match-${i + 1}`,
+            timestamp: 1700000000000 + i * 1000,
+            mode: "ai",
+            difficulty: "hard",
+            shape: "rectangle",
+            boardSize: 5,
+            playerOne: { id: "p1", name: `Player ${i + 1}`, score: 10, kind: "human" },
+            playerTwo: { id: "p2", name: "Computer", score: 5, kind: "ai" },
+            winner: i < 50 ? "p1" : "p2",
+            winnerName: i < 50 ? `Player ${i + 1}` : "Computer",
+        }));
+
+        const rawState = {
+            schemaVersion: SCHEMA_VERSION,
+            settings: initialSettingsState,
+            statistics: {
+                gamesPlayed: 60,
+                wins: 50,
+                losses: 10,
+                draws: 0,
+                totalBoxesClaimed: 900,
+                currentStreak: 5,
+                longestStreak: 12,
+                vsAi: {
+                    gamesPlayed: 60,
+                    humanWins: 50,
+                    aiWins: 10,
+                    draws: 0,
+                    humanBoxesClaimed: 600,
+                    aiBoxesClaimed: 300,
+                    currentStreak: 5,
+                    longestStreak: 12,
+                    byDifficulty: {
+                        hard: {
+                            gamesPlayed: 60,
+                            wins: 50,
+                            losses: 10,
+                            draws: 0,
+                            humanBoxes: 600,
+                            aiBoxes: 300,
+                        },
+                    },
+                },
+                local: {
+                    gamesPlayed: 0,
+                    p1Wins: 0,
+                    p2Wins: 0,
+                    draws: 0,
+                    p1TotalBoxes: 0,
+                    p2TotalBoxes: 0,
+                },
+                recentMatches: rawMatches,
+            },
+        };
+
+        const migrated = migrate(rawState);
+        expect(migrated.statistics.gamesPlayed).toBe(60);
+        expect(migrated.statistics.wins).toBe(50);
+        expect(migrated.statistics.recentMatches).toHaveLength(50);
+        expect(migrated.statistics.recentMatches[0]!.id).toBe("match-1");
+        expect(migrated.statistics.recentMatches[49]!.id).toBe("match-50");
+        expect(migrated.statistics.vsAi.byDifficulty.hard.wins).toBe(50);
+    });
 });
+

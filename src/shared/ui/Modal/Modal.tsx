@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/shared/ui/Button";
 
 interface ModalProps {
@@ -15,7 +16,7 @@ export function Modal({
     title,
     onClose,
     children,
-    showCloseButton = true,
+    showCloseButton = false,
     footer,
 }: ModalProps) {
     const dialogRef = useRef<HTMLDivElement>(null);
@@ -29,24 +30,10 @@ export function Modal({
         if (!open) return;
 
         const originalOverflow = document.body.style.overflow;
-        const originalPaddingRight = document.body.style.paddingRight;
-
-        const scrollbarWidth =
-            window.innerWidth - document.documentElement.clientWidth;
-
-        if (scrollbarWidth > 0) {
-            const computedPadding = window.getComputedStyle(
-                document.body,
-            ).paddingRight;
-            const currentPaddingNum = parseFloat(computedPadding) || 0;
-            document.body.style.paddingRight = `${currentPaddingNum + scrollbarWidth}px`;
-        }
-
         document.body.style.overflow = "hidden";
 
         return () => {
             document.body.style.overflow = originalOverflow;
-            document.body.style.paddingRight = originalPaddingRight;
         };
     }, [open]);
 
@@ -68,10 +55,11 @@ export function Modal({
     }, [open]);
 
     if (!open) return null;
+    if (typeof document === "undefined") return null;
 
-    return (
+    const modalContent = (
         <div
-            className="fixed inset-0 z-50 overflow-y-auto bg-foreground/40 backdrop-blur-[2px] p-4 sm:p-6 transition-opacity duration-200"
+            className="fixed inset-0 z-50 overflow-y-auto bg-foreground/45 backdrop-blur-[2px] p-4 sm:p-6 transition-opacity duration-200"
             onClick={() => onCloseRef.current()}
             role="presentation"
         >
@@ -92,9 +80,9 @@ export function Modal({
                         {children}
                     </div>
                     {footer !== undefined ? (
-                        <div className="mt-6 flex justify-end">{footer}</div>
+                        <div className="mt-5 flex justify-end">{footer}</div>
                     ) : showCloseButton ? (
-                        <div className="mt-6 flex justify-end">
+                        <div className="mt-5 flex justify-end">
                             <Button
                                 variant="secondary"
                                 onClick={() => onCloseRef.current()}
@@ -107,4 +95,8 @@ export function Modal({
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 }
+
+

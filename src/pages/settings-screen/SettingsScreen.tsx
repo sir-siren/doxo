@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { Card } from "@/shared/ui/Card";
 import { Button } from "@/shared/ui/Button";
 import { Modal } from "@/shared/ui/Modal";
+import { ConfirmationModal } from "@/shared/ui/ConfirmationModal";
 import { Toggle } from "@/shared/ui/Toggle";
 import { PageContainer } from "@/shared/layout";
 import { cn } from "@/shared/lib/cn";
@@ -276,6 +277,7 @@ export function SettingsScreen(props: SettingsScreenProps) {
             </Card>
 
             {/* Reset Data */}
+            {/* Reset Data */}
             <Card className="animate-card-spring stagger-5 flex flex-col gap-3 p-4">
                 <h2 className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
                     Reset
@@ -301,63 +303,52 @@ export function SettingsScreen(props: SettingsScreenProps) {
             </Button>
 
             {/* Reset Confirmation Modal */}
-            <Modal
+            <ConfirmationModal
                 open={confirmAction !== null}
-                title="Are you sure?"
+                title={
+                    confirmAction === "stats"
+                        ? "Reset Statistics"
+                        : "Reset All Settings"
+                }
+                message={
+                    confirmAction === "stats"
+                        ? "Are you sure you want to delete all statistics?"
+                        : "Are you sure you want to restore default settings?"
+                }
+                warning={
+                    confirmAction === "stats"
+                        ? "This will permanently erase all played games, win rates, streaks, and match logs. This action cannot be reversed."
+                        : "This will restore all board preferences, player names, sound, and theme options to their initial defaults."
+                }
+                confirmLabel={
+                    confirmAction === "stats"
+                        ? "Reset Statistics"
+                        : "Reset All Settings"
+                }
+                cancelLabel="Cancel"
+                variant="danger"
+                icon="danger"
+                onConfirm={() => {
+                    if (confirmAction === "stats") props.onResetStatistics();
+                    if (confirmAction === "settings") props.onResetSettings();
+                    setConfirmAction(null);
+                }}
                 onClose={() => setConfirmAction(null)}
-            >
-                <p className="mb-4 font-medium">
-                    {confirmAction === "stats"
-                        ? "This permanently deletes all your statistics."
-                        : "This restores every setting to its default value."}
-                </p>
-                <div className="flex gap-3">
-                    <Button
-                        variant="danger"
-                        fullWidth
-                        onClick={() => {
-                            if (confirmAction === "stats")
-                                props.onResetStatistics();
-                            if (confirmAction === "settings")
-                                props.onResetSettings();
-                            setConfirmAction(null);
-                        }}
-                    >
-                        Confirm
-                    </Button>
-                    <Button
-                        variant="secondary"
-                        fullWidth
-                        onClick={() => setConfirmAction(null)}
-                    >
-                        Cancel
-                    </Button>
-                </div>
-            </Modal>
+            />
 
             {/* Import Confirmation Modal */}
-            <Modal
+            <ConfirmationModal
                 open={pendingImport !== null}
                 title="Import Save Data"
+                message="Are you sure you want to import this save file?"
+                warning="Importing will replace your current statistics, match history, and custom settings with the backup file data."
+                confirmLabel="Import & Overwrite"
+                cancelLabel="Cancel"
+                variant="danger"
+                icon="warning"
+                onConfirm={handleConfirmImport}
                 onClose={() => setPendingImport(null)}
-            >
-                <p className="mb-4 font-medium">
-                    Are you sure you want to import this save file? This will
-                    overwrite your existing statistics and settings.
-                </p>
-                <div className="flex gap-3">
-                    <Button fullWidth onClick={handleConfirmImport}>
-                        Overwrite & Import
-                    </Button>
-                    <Button
-                        variant="secondary"
-                        fullWidth
-                        onClick={() => setPendingImport(null)}
-                    >
-                        Cancel
-                    </Button>
-                </div>
-            </Modal>
+            />
 
             {/* Import Error Modal */}
             <Modal
@@ -365,14 +356,38 @@ export function SettingsScreen(props: SettingsScreenProps) {
                 title="Import Failed"
                 onClose={() => setImportError(null)}
             >
-                <p className="mb-4 font-medium text-danger">{importError}</p>
-                <Button
-                    variant="secondary"
-                    fullWidth
-                    onClick={() => setImportError(null)}
-                >
-                    Dismiss
-                </Button>
+                <div className="flex flex-col gap-4">
+                    <div className="rounded-xl border-2 border-border bg-danger/15 p-3 flex gap-2.5 items-start">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="size-5 text-foreground shrink-0 mt-0.5"
+                            aria-hidden="true"
+                        >
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        <p className="text-xs sm:text-sm font-semibold text-foreground leading-relaxed">
+                            {importError}
+                        </p>
+                    </div>
+
+                    <div className="mt-2 flex justify-end">
+                        <Button
+                            variant="secondary"
+                            fullWidth
+                            onClick={() => setImportError(null)}
+                        >
+                            Dismiss
+                        </Button>
+                    </div>
+                </div>
             </Modal>
 
             {/* Toast Notification */}

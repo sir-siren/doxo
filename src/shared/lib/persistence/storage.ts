@@ -3,14 +3,27 @@ import type {
     ThemeName,
 } from "@/features/settings/state/settings.types";
 import { initialSettingsState } from "@/features/settings/state/settings.slice";
-import type { StatisticsState } from "@/features/statistics/state/statistics.types";
-import { initialStatisticsState } from "@/features/statistics/state/statistics.slice";
-import type { Difficulty } from "@/features/game/types/game.types";
-import type { DifficultyTally } from "@/features/statistics/state/statistics.types";
+import type {
+    DifficultyTally,
+    LocalStats,
+    MatchRecord,
+    StatisticsState,
+    VsAiStats,
+} from "@/features/statistics/state/statistics.types";
+import {
+    deriveStatisticsFromMatches,
+    emptyDifficultyTally,
+    emptyLocalStats,
+    emptyVsAiStats,
+    initialStatisticsState,
+} from "@/features/statistics/state/statistics.slice";
+import type { BoardShape, Difficulty } from "@/features/game/types/game.types";
 
 export const STORAGE_KEY = "doxo:app-state";
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
+
+export const MAX_PERSISTED_MATCHES = 50;
 
 export interface PersistedState {
     schemaVersion: number;
@@ -49,7 +62,7 @@ const pickBoolean = (
     fallback: boolean,
 ): boolean => (isBoolean(source[key]) ? (source[key] as boolean) : fallback);
 
-const isDifficultyTally = (value: unknown): value is DifficultyTally =>
+export const isDifficultyTally = (value: unknown): value is DifficultyTally =>
     isRecord(value) &&
     isFiniteNumber(value["gamesPlayed"]) &&
     isFiniteNumber(value["wins"]) &&
@@ -88,34 +101,260 @@ const parseSettings = (raw: unknown): SettingsState => {
     };
 };
 
-const parseStatistics = (raw: unknown): StatisticsState => {
-    if (!isRecord(raw)) return initialStatisticsState;
-    const byDifficulty = isRecord(raw["byDifficulty"])
-        ? raw["byDifficulty"]
-        : {};
-    const tallyFor = (difficulty: Difficulty): DifficultyTally => {
-        const tally = byDifficulty[difficulty];
-        return isDifficultyTally(tally)
-            ? tally
-            : { ...initialStatisticsState.byDifficulty[difficulty] };
-    };
-    const intOr = (value: unknown): number =>
-        isFiniteNumber(value) ? Math.max(0, Math.trunc(value)) : 0;
+const intOr = (value: unknown): number =>
+    isFiniteNumber(value) ? Math.max(0, Math.trunc(value)) : 0;
+
+const parseDifficultyTally = (raw: unknown): DifficultyTally => {
+    if (!isRecord(raw)) return { ...emptyDifficultyTally };
+    const gamesPlayed = intOr(raw["gamesPlayed"]);
+    const wins = intOr(raw["wins"]);
     return {
-        gamesPlayed: intOr(raw["gamesPlayed"]),
-        wins: intOr(raw["wins"]),
+        gamesPlayed,
+        wins,
         losses: intOr(raw["losses"]),
         draws: intOr(raw["draws"]),
+        humanBoxes: intOr(raw["humanBoxes"]),
+        aiBoxes: intOr(raw["aiBoxes"]),
+        winRate: gamesPlayed > 0 ? wins / gamesPlayed : 0,
+    };
+};
+
+const parseVsAiStats = (
+    raw: unknown,
+    legacyByDiff?: Record<Difficulty, DifficultyTally>,
+): VsAiStats => {
+    const base = emptyVsAiStats();
+    if (!isRecord(raw)) {
+        if (legacyByDiff) {
+            base.byDifficulty = legacyByDiff;
+        }
+        return base;
+    }
+    const byDifficultyRaw = isRecord(raw["byDifficulty"])
+        ? (raw["byDifficulty"] as Record<string, unknown>)
+        : (legacyByDiff ?? {});
+    const byDifficulty: Record<Difficulty, DifficultyTally> = {
+        easy: parseDifficultyTally(byDifficultyRaw["easy"]),
+        medium: parseDifficultyTally(byDifficultyRaw["medium"]),
+        hard: parseDifficultyTally(byDifficultyRaw["hard"]),
+        insane: parseDifficultyTally(byDifficultyRaw["insane"]),
+        adaptive: parseDifficultyTally(byDifficultyRaw["adaptive"]),
+    };
+
+    const gamesPlayed = intOr(raw["gamesPlayed"]);
+    const humanWins = intOr(raw["humanWins"]);
+    const aiWins = intOr(raw["aiWins"]);
+    const humanBoxesClaimed = intOr(raw["humanBoxesClaimed"]);
+    const aiBoxesClaimed = intOr(raw["aiBoxesClaimed"]);
+
+    return {
+        gamesPlayed,
+        humanWins,
+        aiWins,
+        draws: intOr(raw["draws"]),
+        humanWinRate: gamesPlayed > 0 ? humanWins / gamesPlayed : 0,
+        aiWinRate: gamesPlayed > 0 ? aiWins / gamesPlayed : 0,
+        humanBoxesClaimed,
+        aiBoxesClaimed,
+        humanAvgScore: gamesPlayed > 0 ? humanBoxesClaimed / gamesPlayed : 0,
+        aiAvgScore: gamesPlayed > 0 ? aiBoxesClaimed / gamesPlayed : 0,
+        humanHighScore: intOr(raw["humanHighScore"]),
+        aiHighScore: intOr(raw["aiHighScore"]),
+        currentStreak: intOr(raw["currentStreak"]),
+        longestStreak: intOr(raw["longestStreak"]),
+        byDifficulty,
+    };
+};
+
+const parseLocalStats = (raw: unknown): LocalStats => {
+    if (!isRecord(raw)) return emptyLocalStats();
+    const gamesPlayed = intOr(raw["gamesPlayed"]);
+    const p1Wins = intOr(raw["p1Wins"]);
+    const p2Wins = intOr(raw["p2Wins"]);
+    const p1TotalBoxes = intOr(raw["p1TotalBoxes"]);
+    const p2TotalBoxes = intOr(raw["p2TotalBoxes"]);
+
+    return {
+        gamesPlayed,
+        p1Wins,
+        p2Wins,
+        draws: intOr(raw["draws"]),
+        p1WinRate: gamesPlayed > 0 ? p1Wins / gamesPlayed : 0,
+        p2WinRate: gamesPlayed > 0 ? p2Wins / gamesPlayed : 0,
+        p1TotalBoxes,
+        p2TotalBoxes,
+        p1AvgScore: gamesPlayed > 0 ? p1TotalBoxes / gamesPlayed : 0,
+        p2AvgScore: gamesPlayed > 0 ? p2TotalBoxes / gamesPlayed : 0,
+        p1HighScore: intOr(raw["p1HighScore"]),
+        p2HighScore: intOr(raw["p2HighScore"]),
+        avgMargin: isFiniteNumber(raw["avgMargin"]) ? Number(raw["avgMargin"]) : 0,
+    };
+};
+
+export const parseMatchRecord = (raw: unknown): MatchRecord | null => {
+    if (!isRecord(raw)) return null;
+    if (typeof raw["id"] !== "string" || !isFiniteNumber(raw["timestamp"]))
+        return null;
+    const mode = raw["mode"] === "ai" ? "ai" : "local";
+    const difficulty = isDifficulty(raw["difficulty"])
+        ? raw["difficulty"]
+        : "medium";
+    const shape: BoardShape =
+        raw["shape"] === "triangle" ||
+        raw["shape"] === "l-shape" ||
+        raw["shape"] === "hex"
+            ? raw["shape"]
+            : "rectangle";
+    const boardSize = isFiniteNumber(raw["boardSize"])
+        ? Math.trunc(raw["boardSize"])
+        : 6;
+    const p1Raw = isRecord(raw["playerOne"]) ? raw["playerOne"] : {};
+    const p2Raw = isRecord(raw["playerTwo"]) ? raw["playerTwo"] : {};
+    const winnerRaw = raw["winner"];
+    const winner: "p1" | "p2" | "draw" =
+        winnerRaw === "p1" || winnerRaw === "p2" || winnerRaw === "draw"
+            ? winnerRaw
+            : "draw";
+
+    const p1Name =
+        typeof p1Raw["name"] === "string" ? p1Raw["name"] : "Player 1";
+    const p2Name =
+        typeof p2Raw["name"] === "string"
+            ? p2Raw["name"]
+            : mode === "ai"
+              ? "Computer"
+              : "Player 2";
+
+    const winnerName =
+        typeof raw["winnerName"] === "string"
+            ? raw["winnerName"]
+            : winner === "draw"
+              ? "Draw"
+              : winner === "p1"
+                ? p1Name
+                : p2Name;
+
+    return {
+        id: raw["id"],
+        timestamp: raw["timestamp"],
+        mode,
+        difficulty,
+        shape,
+        boardSize,
+        playerOne: {
+            id: "p1",
+            name: p1Name,
+            score: intOr(p1Raw["score"]),
+            kind: p1Raw["kind"] === "ai" ? "ai" : "human",
+        },
+        playerTwo: {
+            id: "p2",
+            name: p2Name,
+            score: intOr(p2Raw["score"]),
+            kind: p2Raw["kind"] === "ai" ? "ai" : "human",
+        },
+        winner,
+        winnerName,
+    };
+};
+
+export const parseStatistics = (raw: unknown): StatisticsState => {
+    if (!isRecord(raw)) return initialStatisticsState;
+
+    const recentMatchesRaw = Array.isArray(raw["recentMatches"])
+        ? raw["recentMatches"]
+        : Array.isArray(raw["matches"])
+          ? raw["matches"]
+          : [];
+
+    const recentMatches: MatchRecord[] = [];
+    for (const item of recentMatchesRaw) {
+        const parsed = parseMatchRecord(item);
+        if (parsed) recentMatches.push(parsed);
+    }
+
+    if (recentMatches.length > 0) {
+        const derived = deriveStatisticsFromMatches(recentMatches);
+        return {
+            ...derived,
+            recentMatches: recentMatches.slice(0, MAX_PERSISTED_MATCHES),
+        };
+    }
+
+    // Fallback for legacy state without match logs
+    const byDifficultyRaw = isRecord(raw["byDifficulty"])
+        ? (raw["byDifficulty"] as Record<string, unknown>)
+        : {};
+    const byDifficulty: Record<Difficulty, DifficultyTally> = {
+        easy: parseDifficultyTally(byDifficultyRaw["easy"]),
+        medium: parseDifficultyTally(byDifficultyRaw["medium"]),
+        hard: parseDifficultyTally(byDifficultyRaw["hard"]),
+        insane: parseDifficultyTally(byDifficultyRaw["insane"]),
+        adaptive: parseDifficultyTally(byDifficultyRaw["adaptive"]),
+    };
+
+    const vsAi = parseVsAiStats(raw["vsAi"], byDifficulty);
+    const local = parseLocalStats(raw["local"]);
+
+    const gamesPlayed = intOr(raw["gamesPlayed"]);
+    const wins = intOr(raw["wins"]);
+
+    return {
+        gamesPlayed,
+        wins,
+        losses: intOr(raw["losses"]),
+        draws: intOr(raw["draws"]),
+        winRate: gamesPlayed > 0 ? wins / gamesPlayed : 0,
         totalBoxesClaimed: intOr(raw["totalBoxesClaimed"]),
         currentStreak: intOr(raw["currentStreak"]),
         longestStreak: intOr(raw["longestStreak"]),
-        byDifficulty: {
-            easy: tallyFor("easy"),
-            medium: tallyFor("medium"),
-            hard: tallyFor("hard"),
-            insane: tallyFor("insane"),
-            adaptive: tallyFor("adaptive"),
+        vsAi,
+        local,
+        byDifficulty,
+        profiles: {
+            playerOne: {
+                name: "Player 1",
+                totalMatches: gamesPlayed,
+                wins,
+                losses: intOr(raw["losses"]),
+                draws: intOr(raw["draws"]),
+                winRate: gamesPlayed > 0 ? wins / gamesPlayed : 0,
+                totalBoxes: intOr(raw["totalBoxesClaimed"]),
+                avgScore: gamesPlayed > 0 ? intOr(raw["totalBoxesClaimed"]) / gamesPlayed : 0,
+                highScore: 0,
+                currentStreak: intOr(raw["currentStreak"]),
+                longestStreak: intOr(raw["longestStreak"]),
+            },
+            playerTwo: {
+                name: "Player 2",
+                totalMatches: local.gamesPlayed,
+                wins: local.p2Wins,
+                losses: local.p1Wins,
+                draws: local.draws,
+                winRate: local.p2WinRate ?? (local.gamesPlayed > 0 ? local.p2Wins / local.gamesPlayed : 0),
+                totalBoxes: local.p2TotalBoxes,
+                avgScore: local.p2AvgScore ?? (local.gamesPlayed > 0 ? local.p2TotalBoxes / local.gamesPlayed : 0),
+                highScore: local.p2HighScore ?? 0,
+                currentStreak: 0,
+                longestStreak: 0,
+                dominanceDiff: local.p2Wins - local.p1Wins,
+            },
+            ai: {
+                name: "Computer AI",
+                totalMatches: vsAi.gamesPlayed,
+                wins: vsAi.aiWins,
+                losses: vsAi.humanWins,
+                draws: vsAi.draws,
+                winRate: vsAi.aiWinRate ?? (vsAi.gamesPlayed > 0 ? vsAi.aiWins / vsAi.gamesPlayed : 0),
+                totalBoxes: vsAi.aiBoxesClaimed,
+                avgScore: vsAi.aiAvgScore ?? (vsAi.gamesPlayed > 0 ? vsAi.aiBoxesClaimed / vsAi.gamesPlayed : 0),
+                highScore: vsAi.aiHighScore ?? 0,
+                currentStreak: 0,
+                longestStreak: 0,
+                dominanceDiff: vsAi.aiWins - vsAi.humanWins,
+            },
         },
+        recentMatches: [],
     };
 };
 
@@ -129,7 +368,8 @@ export const migrate = (raw: Record<string, unknown>): PersistedState => {
         : -1;
 
     switch (version) {
-        case SCHEMA_VERSION:
+        case 1:
+        case 2:
             return {
                 schemaVersion: SCHEMA_VERSION,
                 settings: parseSettings(raw["settings"]),
@@ -246,3 +486,4 @@ export const triggerJsonDownload = (
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 };
+
