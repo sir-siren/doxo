@@ -8,12 +8,26 @@
 
 **A neo-brutalist take on the classic pen-and-paper game, built with React 19, Redux Toolkit, Tailwind CSS v4, and procedural Web Audio.**
 
-[![Bun](https://img.shields.io/badge/Bun-1.4+-FDE2E4?style=for-the-badge&logo=bun&logoColor=FFFFFF&labelColor=333333)](https://bun.sh)
-[![React](https://img.shields.io/badge/React-19.2-CDEAC0?style=for-the-badge&logo=react&logoColor=FFFFFF&labelColor=333333)](https://react.dev)
-[![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-2.12-E2D1F9?style=for-the-badge&logo=redux&logoColor=FFFFFF&labelColor=333333)](https://redux-toolkit.js.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-7.0-BEE1E6?style=for-the-badge&logo=typescript&logoColor=FFFFFF&labelColor=333333)](https://www.typescriptlang.org)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.3-B5EAD7?style=for-the-badge&logo=tailwind-css&logoColor=FFFFFF&labelColor=333333)](https://tailwindcss.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-FFF1BA?style=for-the-badge&labelColor=333333)](LICENSE)
+<p align="center">
+    <a href="https://bun.sh">
+        <img alt="Bun" src="https://img.shields.io/badge/Bun-1.4+-FDE2E4?style=flat&logo=bun&logoColor=FDE2E4" />
+    </a>
+    <a href="https://react.dev">
+        <img alt="React" src="https://img.shields.io/badge/React-19.2-CDEAC0?style=flat&logo=react&logoColor=CDEAC0" />
+    </a>
+    <a href="https://redux-toolkit.js.org">
+        <img alt="Redux Toolkit" src="https://img.shields.io/badge/Redux_Toolkit-2.12-E2D1F9?style=flat&logo=redux&logoColor=E2D1F9" />
+    </a>
+    <a href="https://www.typescriptlang.org">
+        <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-7.0-BEE1E6?style=flat&logo=typescript&logoColor=BEE1E6" />
+    </a>
+    <a href="https://tailwindcss.com">
+        <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-4.3-B5EAD7?style=flat&logo=tailwindcss&logoColor=B5EAD7" />
+    </a>
+    <a href="LICENSE">
+        <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-FFF1BA?style=flat" />
+    </a>
+</p>
 
 </div>
 

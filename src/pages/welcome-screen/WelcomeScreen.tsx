@@ -24,7 +24,7 @@ export function WelcomeScreen({
                 Claim the lines. Own the boxes.
             </p>
             <Card className="mt-2 flex flex-col gap-3 p-6">
-                <Button fullWidth onClick={onPlay} autoFocus>
+                <Button fullWidth onClick={onPlay}>
                     Play
                 </Button>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
